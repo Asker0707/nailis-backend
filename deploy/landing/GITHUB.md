@@ -1,4 +1,35 @@
-# Перенос на GitHub: сайт — в публичный репозиторий, бэкенд — в приватный
+# Публикация на GitHub
+
+## Текущая схема (с 10.10.2026)
+
+Один публичный репозиторий **`github.com/Asker0707/nailis-backend`**:
+
+- ветка `master` — весь код проекта (бэкенд, шаблоны, отзывы, скрипты сборки);
+- ветка `gh-pages` — только готовый сайт, его раздаёт GitHub Pages:
+  **https://asker0707.github.io/nailis-backend/**
+
+Обновить сайт после правок:
+
+```bash
+git add -A && git commit -m "Обновление главной" && git push    # код → master
+GH_REPO=git@github.com:Asker0707/nailis-backend.git SITE_URL=https://asker0707.github.io/nailis-backend BRANCH=gh-pages ./deploy/landing/publish_github.sh   # сайт → gh-pages
+```
+
+Ветка `gh-pages` при каждой публикации перезаписывается целиком — в ней
+только сгенерированный сайт. Ветку `master` скрипт не трогает.
+
+Если переименуете репозиторий (Settings → General → Repository name),
+например в `nailis`, адрес сайта станет `https://asker0707.github.io/nailis/` —
+пересоберите сайт с новыми `GH_REPO` и `SITE_URL`, иначе пути на странице
+будут указывать на старую подпапку.
+
+Старый репозиторий `FastApi_Nail_Project` больше не нужен (там старая копия
+сайта) — его можно удалить: Settings → Danger Zone → Delete this repository.
+
+---
+
+## Как было устроено переносом (история)
+
 
 Цель: в `github.com/Asker0707/FastApi_Nail_Project` (публичный) остаётся
 **только рекламная главная** на GitHub Pages, а весь код проекта (бэкенд курса,
