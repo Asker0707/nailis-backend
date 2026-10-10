@@ -44,9 +44,13 @@ class AuthRedirectException(HTTPException):
     Используется для управления потоком при недостаточной аутентификации.
     """
 
-    def __init__(self, redirect_url: str):
+    def __init__(
+        self,
+        redirect_url: str,
+        status_code: int = status.HTTP_303_SEE_OTHER,
+    ):
         super().__init__(
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+            status_code=status_code,
             detail="Требуется аутентификация",
         )
         self.redirect_url = redirect_url
@@ -61,19 +65,6 @@ async def authenticate_user(
     """
     Аутентифицирует пользователя по email и паролю.
     Опционально проверяет права администратора.
-
-    Args:
-        email (str): Email пользователя.
-        password (str): Пароль пользователя.
-        db (AsyncSession): Асинхронная сессия базы данных.
-        require_admin (bool): Требовать права администратора.
-
-    Raises:
-        HTTPException: Если пользователь не найден,
-                       пароль неверен или нет прав администратора.
-
-    Returns:
-        models.User: Аутентифицированный пользователь.
     """
     normalized_email = email.lower().strip()
     result = await db.execute(select(models.User).where(models.User.email == normalized_email))
@@ -87,7 +78,14 @@ async def authenticate_user(
             detail="Неверные учетные данные"
         )
 
-    if require_admin and not user.is_admin:
+    if not user.is_active:
+        logger.warning("Попытка входа в деактивированный аккаунт: %s", normalized_email)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Аккаунт деактивирован",
+        )
+
+    if require_admin and not (user.is_admin or user.role == models.UserRole.admin):
         logger.warning(
             "Пользователь %s попытался зайти в админку без прав", normalized_email)
         raise HTTPException(

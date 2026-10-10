@@ -28,6 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.dependencies import get_current_user
 from db import models
 from db.database import get_db
+from services.course_access import get_course_for_lesson, user_has_course_access
 from services.lesson_service import (
     is_lesson_completed,
     mark_lesson_completed,
@@ -59,11 +60,18 @@ async def complete_lesson(
     Raises:
         HTTPException: 404 если урок не найден
     """
+    lesson, course = await get_course_for_lesson(lesson_id, db)
+    if not lesson or not course:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Урок не найден")
+    if not await user_has_course_access(current_user, course, db):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Нет доступа к курсу")
+
     result = await mark_lesson_completed(lesson_id, current_user.id, db)
     if result is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Урок не найден")
     if not result:
         return JSONResponse(
+            
             {"detail": "Урок уже завершён"},
             status_code=status.HTTP_400_BAD_REQUEST
         )

@@ -1,445 +1,213 @@
 {% extends "base.html" %}
 {% block title %}{{ lesson.title }}{% endblock %}
+
+{% block extra_css %}
+  <link href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" rel="stylesheet" />
+  <link href="/static/css/pages/lesson-detail.css?v={{ asset_v|default('dev', true) }}-adapt2" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
-<style>
-  /* Общий стиль */
-  .lesson-wrapper {
-    max-width: 1200px;
-    margin: auto;
-  }
+<div
+  id="lessonPage"
+  class="lesson-shell"
+  role="main"
+  aria-labelledby="lesson-title"
+  data-lesson-id="{{ lesson.id }}"
+  data-video-url="{{ lesson.video_url or '' }}"
+  data-lesson-completed="{{ '1' if lesson_completed else '0' }}"
+>
+  <header class="lesson-topbar reveal-up">
+    <a href="/courses/{{ course.id }}" class="lesson-back">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      <span>{{ course.title }}</span>
+    </a>
 
-  .lesson-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #6b3e26;
-    text-align: center;
-    margin-bottom: 2rem;
-  }
+    <div class="lesson-progress-block" aria-label="Прогресс курса">
+      <div class="lesson-progress-meta">
+        <span>
+          {% if lesson_position and course_lessons_total %}
+            Урок {{ lesson_position }} из {{ course_lessons_total }}
+          {% else %}
+            Урок
+          {% endif %}
+        </span>
+        <strong>{{ progress_percent }}%</strong>
+      </div>
+      <div class="lesson-progress-track" role="progressbar" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+        <span style="width: {{ progress_percent }}%;"></span>
+      </div>
+    </div>
 
-  .lesson-subtitle {
-    font-size: 1.2rem;
-    text-align: center;
-    color: #8c6a55;
-    margin-bottom: 2rem;
-  }
+    <div class="lesson-nav-mini">
+      {% if prev_lesson %}
+      <a class="lesson-nav-btn" href="/lessons/{{ prev_lesson.id }}" aria-label="Предыдущий урок">
+        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+      </a>
+      {% else %}
+      <span class="lesson-nav-btn is-disabled" aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
+      {% if next_lesson %}
+      <a class="lesson-nav-btn" href="/lessons/{{ next_lesson.id }}" aria-label="Следующий урок">
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+      </a>
+      {% else %}
+      <span class="lesson-nav-btn is-disabled" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+      {% endif %}
+    </div>
+  </header>
 
-  /* Карточки */
-  .lesson-card {
-    border: none;
-    border-radius: 1rem;
-    background: #fffdf9;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-  }
-
-  .lesson-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-  }
-
-  .lesson-content {
-    font-size: 1.1rem;
-    line-height: 1.7;
-    color: #3b2f2f;
-  }
-
-  /* Медиа */
-  .lesson-video,
-  .lesson-image {
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-    transition: transform 0.5s ease;
-  }
-
-  .lesson-video:hover,
-  .lesson-image:hover {
-    transform: scale(1.02);
-  }
-
-  /* Кнопки */
-  .btn-complete {
-    border-radius: 2rem;
-    font-size: 1.1rem;
-    padding: 0.6rem 1.5rem;
-    background: linear-gradient(135deg, #a36b5e, #7b5a50);
-    border: none;
-    color: #fffdf9;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-
-  .btn-complete:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(123, 90, 80, 0.4);
-  }
-
-  /* Заметки */
-  .note-block {
-    margin-top: 3rem;
-    padding: 2rem;
-    border-radius: 1rem;
-    background: #fefaf5;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
-  }
-
-  .note-block h4 {
-    font-weight: 700;
-    color: #6b3e26;
-    margin-bottom: 1.5rem;
-  }
-
-  .note-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    max-width: 100%;
-  }
-
-  .note-content small {
-    margin-top: auto;
-    color: #999;
-    font-size: 0.85rem;
-  }
-
-  .note-actions button {
-    border-radius: 1.5rem;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    background-color: #fffdf9;
-    border: 1.5px solid #7b5a50;
-    transition: all 0.3s ease;
-  }
-
-  .note-actions button:hover {
-    background-color: #7b5a50;
-    color: #fffdf9;
-    box-shadow: 0 4px 10px rgba(123, 90, 80, 0.3);
-    transform: translateY(-2px);
-  }
-
-  /* Текстовое поле заметок */
-  #noteContent {
-    border-radius: 0.8rem;
-    border: 1px solid #e4d5c3;
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
-    resize: none;
-  }
-</style>
-
-<div class="lesson-wrapper mt-4 mb-5">
-  <h1 class="lesson-title">
-    <i class="bi bi-journal-bookmark-fill text-primary"></i> {{ lesson.title }}
-  </h1>
-  <p class="lesson-subtitle">Изучайте материал и добавляйте свои заметки для удобства ✨</p>
-
-  <div class="row g-4">
-    <!-- Текст -->
-    <div class="col-lg-6">
-      <div class="card lesson-card h-100 p-3">
+  <div class="lesson-layout">
+    <div class="lesson-main">
+      <section class="lesson-materials surface-card reveal-up" style="--delay: 40ms;">
+        <div class="section-head">
+          <div>
+            <span class="section-chip">Материалы</span>
+            <h2>Конспект урока</h2>
+          </div>
+        </div>
         <div class="lesson-content">
-          {% if lesson_text_html %} {{ lesson_text_html | safe }} {% else %}
-          <p class="text-muted">Описание к уроку отсутствует.</p>
+          {% if lesson_text_html %}
+            {{ lesson_text_html | safe }}
+          {% else %}
+            <p class="muted">Описание к уроку пока не добавлено.</p>
           {% endif %}
         </div>
-      </div>
-    </div>
+      </section>
 
-    <!-- Видео/Изображение -->
-    <div class="col-lg-6">
-      <div class="card lesson-card d-flex align-items-center justify-content-center p-3">
-        {% if lesson.video_url %}
-          {% set ext = lesson.video_url.split('.')[-1].lower() %}
-          {% if ext in ['mp4', 'webm', 'ogg', 'mov'] %}
-            <video controls class="lesson-video w-100" style="max-height: 400px">
-              <source src="{{ lesson.video_url }}" type="video/{{ ext }}" />
-              Ваш браузер не поддерживает видео.
-            </video>
-          {% elif ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-            <img src="{{ lesson.video_url }}" class="lesson-image img-fluid" alt="Изображение урока" />
+      <section class="lesson-player-card reveal-up" style="--delay: 90ms;">
+        <div class="lesson-player-head">
+          <div class="lesson-player-heading">
+            <p class="lesson-kicker">Видео урока</p>
+            <h1 id="lesson-title" class="lesson-title">{{ lesson.title }}</h1>
+          </div>
+          <button
+            id="completeLessonBtn"
+            type="button"
+            class="btn btn-complete lesson-complete-btn{% if lesson_completed %} is-done{% endif %}"
+            {% if lesson_completed %}disabled{% endif %}
+          >
+            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+            <span>{% if lesson_completed %}Урок пройден{% else %}Завершить урок{% endif %}</span>
+          </button>
+        </div>
+
+        <div class="video-card">
+          {% if lesson.video_url %}
+          <div class="video-shell">
+            <div id="videoFrame" class="video-frame" aria-live="polite">
+              {% set raw_url = lesson.video_url|string %}
+              {% set tail = raw_url.rstrip('/').split('/')[-1].split('?')[0].lower() %}
+              {% set is_media_route = '/media/lessons/' in raw_url %}
+              {% set ext = tail if tail in ['mp4','webm','ogg','mov','m4v'] else ('mp4' if (is_media_route or tail in ['720p','1080p','720','1080']) else '') %}
+              {% if ext %}
+                {% set mime = 'video/mp4' if ext in ['mp4', 'mov', 'm4v'] else 'video/' ~ ext %}
+                <video id="lessonVideo" class="plyr__video" controls playsinline preload="metadata"
+                       aria-label="Видео урока {{ lesson.title }}">
+                  <source src="{{ lesson.video_url }}" type="{{ mime }}">
+                  Ваш браузер не поддерживает видео.
+                </video>
+              {% else %}
+                <div class="video-empty">Неподдерживаемый формат видео</div>
+              {% endif %}
+            </div>
+
+            <div class="video-toolbar">
+              <div class="video-toolbar-row">
+                <span class="video-toolbar-hint">«Картинка в картинке» — в плеере</span>
+                {% if lesson.video_sources %}
+                <select id="videoQualitySelect" class="quality-select" aria-label="Выбор качества видео">
+                  {% for quality, url in lesson.video_sources.items() %}
+                    <option value="{{ url }}" {% if url==lesson.video_url %}selected{% endif %}>{{ quality }}</option>
+                  {% endfor %}
+                </select>
+                {% endif %}
+              </div>
+            </div>
+          </div>
           {% else %}
-            <p class="text-muted">Неизвестный формат файла: {{ ext }}</p>
+          <div class="video-empty">Видео для этого урока пока не доступно</div>
           {% endif %}
-        {% else %}
-          <p class="text-muted">Нет видео или изображения для этого урока.</p>
+        </div>
+
+        {% if next_lesson %}
+        <a class="lesson-next-link" href="/lessons/{{ next_lesson.id }}" id="nextLessonBtn">
+          <span>Дальше: <strong>{{ next_lesson.title }}</strong></span>
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+        {% elif course %}
+        <a class="lesson-next-link" href="/courses/{{ course.id }}">
+          <span>К курсу и финалу</span>
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
         {% endif %}
-      </div>
+      </section>
     </div>
-  </div>
 
-  <!-- Навигация и завершение -->
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-5 gap-3">
-    <a href="/courses/{{ course.id }}" class="btn btn-outline-secondary shadow-sm">
-      ← Назад к курсу
-    </a>
-    <button id="completeLessonBtn" class="btn btn-complete shadow" aria-live="polite">
-      ✅ Отметить как завершённый
-    </button>
-  </div>
+    <aside class="lesson-sidebar reveal-up" style="--delay: 120ms;">
+      <section class="lesson-side-card lesson-outline-card">
+        <div class="lesson-side-head">
+          <span class="section-chip">Курс</span>
+          <h3>Оглавление</h3>
+        </div>
+        <ol class="lesson-outline">
+          {% for item in course_outline %}
+          <li class="{% if item.is_current %}is-current{% endif %}{% if item.completed %} is-done{% endif %}">
+            {% if item.is_current %}
+            <span class="outline-link">
+              <i class="bi {% if item.completed %}bi-check-circle-fill{% else %}bi-play-circle-fill{% endif %}" aria-hidden="true"></i>
+              <span>{{ item.title }}</span>
+            </span>
+            {% else %}
+            <a class="outline-link" href="/lessons/{{ item.id }}">
+              <i class="bi {% if item.completed %}bi-check-circle-fill{% else %}bi-circle{% endif %}" aria-hidden="true"></i>
+              <span>{{ item.title }}</span>
+            </a>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+      </section>
 
-  <!-- Заметки -->
-  <div class="note-block">
-    <h4>📝 Личные заметки</h4>
-    <ul id="notesList" class="list-group mb-3"></ul>
+      <section class="lesson-side-card lesson-notes-card" aria-labelledby="notes-heading">
+        <div class="lesson-side-head">
+          <span class="section-chip">Заметки</span>
+          <h3 id="notes-heading">Ваш конспект</h3>
+        </div>
 
-    <textarea id="noteContent" class="form-control mt-2" rows="4"
-      placeholder="Добавьте новую заметку..." aria-label="Добавить новую заметку"></textarea>
-    <button class="btn btn-complete shadow mt-3" id="saveNoteBtn">💾 Добавить заметку</button>
+        <div id="notesContainer" class="note-list" role="list" aria-label="Список заметок">
+          <div class="note-item"><div class="note-body"><div class="note-text muted">Загрузка…</div></div></div>
+        </div>
 
-    <div id="noteStatus" class="text-success mt-2" style="display: none" role="alert"></div>
+        <div class="notes-compose">
+          <div class="note-compose-tools">
+            <button type="button" id="insertTimestampBtn" class="btn btn-timestamp" title="Вставить текущее время видео в заметку">
+              <i class="bi bi-stopwatch" aria-hidden="true"></i>
+              <span>Вставить таймкод</span>
+              <strong id="timestampPreview" class="timestamp-preview">0:00</strong>
+            </button>
+          </div>
+          <textarea
+            id="noteContent"
+            class="notes-textarea"
+            placeholder="Важный шаг, материал или вывод…"
+            aria-label="Новая заметка"
+            rows="4"
+          ></textarea>
+        </div>
+        <div class="note-controls">
+          <button id="saveNoteBtn" class="btn btn-complete" type="button">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i> Добавить заметку
+          </button>
+          <button id="clearNoteBtn" class="btn btn-outline" type="button">Очистить</button>
+          <div id="noteStatus" class="muted note-status" hidden aria-live="polite"></div>
+        </div>
+      </section>
+    </aside>
   </div>
 </div>
 {% endblock %}
 
-
 {% block extra_js %}
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    loadNotes();
-    checkIfLessonCompleted();
-
-    document
-      .getElementById("completeLessonBtn")
-      .addEventListener("click", markLessonCompleted);
-    document.getElementById("saveNoteBtn").addEventListener("click", saveNote);
-  });
-
-  // Проверка завершения урока
-  async function checkIfLessonCompleted() {
-  const btn = document.getElementById("completeLessonBtn");
-  try {
-    const res = await fetch("/lessons/{{ lesson.id }}/complete", {
-      credentials: "same-origin",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.completed) {
-        btn.textContent = "✅ Завершен";
-        btn.disabled = true;
-      } else {
-        btn.textContent = "✅ Отметить как завершённый";
-        btn.disabled = false;
-      }
-    } else {
-      btn.textContent = "✅ Отметить как завершённый";
-      btn.disabled = false;
-    }
-  } catch (err) {
-    btn.textContent = "✅ Отметить как завершённый";
-    btn.disabled = false;
-  }
-}
-
-  // Отметить урок завершённым
-  async function markLessonCompleted() {
-    const btn = document.getElementById("completeLessonBtn");
-    btn.disabled = true;
-    btn.textContent = "⏳ Отмечаем...";
-    try {
-      const res = await fetch("/lessons/{{ lesson.id }}/complete", {
-        method: "PUT",
-        credentials: "same-origin",
-      });
-      if (res.ok) {
-        btn.textContent = "✅ Завершен";
-        btn.disabled = true;
-      } else {
-        const data = await res.json();
-        alert(data.detail || "Ошибка при отметке урока");
-        btn.textContent = "✅ Отметить как завершённый";
-        btn.disabled = false;
-      }
-    } catch (err) {
-      alert("Ошибка сети");
-      btn.textContent = "✅ Отметить как завершённый";
-      btn.disabled = false;
-    }
-  }
-
-  // Загрузка заметок
-  async function loadNotes() {
-    const res = await fetch("/lessons/{{ lesson.id }}/notes", {
-      credentials: "same-origin",
-    });
-    const list = document.getElementById("notesList");
-    list.innerHTML = "";
-    if (res.ok) {
-      const notes = await res.json();
-      if (notes.length === 0) {
-        list.innerHTML =
-          '<li class="list-group-item text-muted">Заметок пока нет.</li>';
-      } else {
-        for (const note of notes) {
-          const li = document.createElement("li");
-          li.className = "list-group-item d-flex";
-          li.dataset.noteId = note.id;
-          li.innerHTML = `
-          <div class="note-content">
-            <div class="note-text">${escapeHtml(note.content)}</div>
-            <small class="text-muted">${new Date(
-              note.created_at
-            ).toLocaleString()}</small>
-          </div>
-          <div class="note-actions">
-            <button class="btn btn-sm btn-outline-primary btn-edit">✏️ Редактировать</button>
-            <button class="btn btn-sm btn-outline-danger btn-delete">🗑️ Удалить</button>
-          </div>`;
-          list.appendChild(li);
-        }
-
-        list.querySelectorAll(".btn-delete").forEach((btn) => {
-          btn.addEventListener("click", onDeleteNote);
-        });
-        list.querySelectorAll(".btn-edit").forEach((btn) => {
-          btn.addEventListener("click", onEditNote);
-        });
-      }
-    } else {
-      list.innerHTML =
-        '<li class="list-group-item text-danger">Ошибка загрузки заметок</li>';
-    }
-  }
-
-  // Добавить новую заметку
-  async function saveNote() {
-    const textarea = document.getElementById("noteContent");
-    const content = textarea.value.trim();
-    if (!content) {
-      alert("Заметка не может быть пустой");
-      return;
-    }
-    const btn = document.getElementById("saveNoteBtn");
-    btn.disabled = true;
-    btn.textContent = "⏳ Сохраняем...";
-    try {
-      const res = await fetch("/lessons/{{ lesson.id }}/note", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "same-origin",
-        body: JSON.stringify({ content }),
-      });
-      if (res.ok) {
-        textarea.value = "";
-        showNoteStatus("Заметка успешно добавлена ✅");
-        loadNotes();
-      } else {
-        alert("Не удалось добавить заметку");
-      }
-    } catch (err) {
-      alert("Ошибка сети при добавлении заметки");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "💾 Добавить заметку";
-    }
-  }
-
-  function showNoteStatus(msg) {
-    const status = document.getElementById("noteStatus");
-    status.textContent = msg;
-    status.style.display = "block";
-    setTimeout(() => {
-      status.style.display = "none";
-    }, 2000);
-  }
-
-  // Удалить заметку
-  async function onDeleteNote(event) {
-    if (!confirm("Удалить эту заметку?")) return;
-
-    const li = event.target.closest("li");
-    const noteId = li.dataset.noteId;
-
-    try {
-      const res = await fetch(`/lessons/{{ lesson.id }}/note/${noteId}`, {
-        method: "DELETE",
-        credentials: "same-origin",
-      });
-      if (res.ok) {
-        showNoteStatus("Заметка удалена 🗑️");
-        loadNotes();
-      } else {
-        alert("Ошибка при удалении заметки");
-      }
-    } catch (err) {
-      alert("Ошибка сети при удалении заметки");
-    }
-  }
-
-  // Начать редактирование заметки
-  function onEditNote(event) {
-    const li = event.target.closest("li");
-    const noteId = li.dataset.noteId;
-    const contentDiv = li.querySelector(".note-text");
-
-    if (li.querySelector("textarea")) return;
-
-    const originalText = contentDiv.textContent;
-
-    const textarea = document.createElement("textarea");
-    textarea.className = "form-control note-edit-textarea";
-    textarea.value = originalText;
-
-    const saveBtn = document.createElement("button");
-    saveBtn.className = "btn btn-sm btn-success";
-    saveBtn.textContent = "💾 Сохранить";
-
-    const cancelBtn = document.createElement("button");
-    cancelBtn.className = "btn btn-sm btn-secondary";
-    cancelBtn.textContent = "Отмена";
-
-    contentDiv.innerHTML = "";
-    contentDiv.appendChild(textarea);
-    contentDiv.appendChild(saveBtn);
-    contentDiv.appendChild(cancelBtn);
-
-    cancelBtn.onclick = () => {
-      contentDiv.textContent = originalText;
-    };
-
-    saveBtn.onclick = async () => {
-      const newContent = textarea.value.trim();
-      if (!newContent) {
-        alert("Заметка не может быть пустой");
-        return;
-      }
-      saveBtn.disabled = true;
-      cancelBtn.disabled = true;
-      try {
-        const res = await fetch(`/lessons/{{ lesson.id }}/note/${noteId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "same-origin",
-          body: JSON.stringify({ content: newContent }),
-        });
-        if (res.ok) {
-          showNoteStatus("Заметка обновлена ✅");
-          loadNotes();
-        } else {
-          alert("Ошибка при обновлении заметки");
-        }
-      } catch (err) {
-        alert("Ошибка сети при обновлении заметки");
-      } finally {
-        saveBtn.disabled = false;
-        cancelBtn.disabled = false;
-      }
-    };
-  }
-
-  // Экранирование HTML
-  function escapeHtml(text) {
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.min.js" defer></script>
+  <script src="/static/js/lesson-detail.js?v={{ asset_v|default('dev', true) }}-confirm1" defer></script>
 {% endblock %}

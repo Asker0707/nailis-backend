@@ -1,22 +1,107 @@
 {% extends "base.html" %}
-{% block title %}{{ course and "Редактировать курс" or "Создать курс" }}{% endblock %}
+{% block title %}{{ course and "Редактировать курс" or "Создать курс" }} | Nailis.hub{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2>{{ course and "Редактировать курс" or "Создать курс" }}</h2>
-  <form method="post"
-        action="{{ course and ('/admin/courses/' ~ course.id ~ '/update') or '/admin/courses/create' }}"
-        enctype="multipart/form-data">
-    <div class="mb-3">
-      <label>Название</label>
-      <input type="text" name="title" class="form-control" value="{{ course and course.title or '' }}" required>
-    </div>
-    <div class="mb-3">
-      <label>Описание</label>
-      <textarea name="description" class="form-control">{{ course and course.description or '' }}</textarea>
-    </div>
-    
-    <button type="submit" class="btn btn-primary">Сохранить</button>
-    <a href="/admin/courses" class="btn btn-secondary">Назад</a>
-  </form>
+<div class="nh-page admin-page">
+  <header class="nh-surface admin-hero reveal-up">
+    <span class="nh-kicker">Админка</span>
+    <h1>{{ course and "Редактировать курс" or "Новый курс" }}</h1>
+    <p>Заполните название и описание — остальное можно донастроить позже через список уроков.</p>
+  </header>
+
+  <section class="nh-surface reveal-up" style="--delay: 50ms;">
+    <form
+      class="admin-form"
+      method="post"
+      action="{{ course and ('/admin/courses/' ~ course.id ~ '/edit') or '/admin/courses/create' }}"
+      enctype="multipart/form-data"
+    >
+      <div>
+        <label class="form-label" for="courseTitle">Название</label>
+        <input
+          id="courseTitle"
+          type="text"
+          name="title"
+          class="form-control"
+          value="{{ course and course.title or '' }}"
+          required
+        >
+      </div>
+      <div>
+        <label class="form-label" for="courseDescription">Описание</label>
+        <textarea
+          id="courseDescription"
+          name="description"
+          class="form-control"
+          rows="5"
+        >{{ course and course.description or '' }}</textarea>
+      </div>
+      <div>
+        <label class="form-label" for="coursePrice">Цена, ₽</label>
+        <input
+          id="coursePrice"
+          type="number"
+          name="price"
+          class="form-control"
+          min="0"
+          step="100"
+          inputmode="numeric"
+          placeholder="Например, 15000"
+          value="{{ course.price if course and course.price is not none else '' }}"
+        >
+        <div class="form-text">Для платных курсов. У бесплатных можно оставить пустым.</div>
+      </div>
+      <div>
+        <label class="form-label" for="courseCover">Обложка курса</label>
+        <div class="course-cover-picker">
+          <div
+            class="course-cover-preview"
+            id="courseCoverPreview"
+            style="background-image: url('{{ cover_preview|default('/static/images/nail-polish-bottle.png', true) }}');"
+          ></div>
+          <div class="course-cover-controls">
+            <input
+              id="courseCover"
+              type="file"
+              name="cover"
+              class="form-control"
+              accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+            >
+            <div class="form-text">JPG, PNG, WEBP или GIF до 5 МБ. Если не выбрать — будет дефолтная обложка.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          name="is_free"
+          value="1"
+          id="courseIsFree"
+          {% if course and course.is_free %}checked{% endif %}
+        >
+        <label class="form-check-label" for="courseIsFree">
+          Бесплатный / открыт всем зарегистрированным
+        </label>
+      </div>
+      <div class="admin-form-actions is-sticky">
+        <button type="submit" class="nh-btn primary">Сохранить</button>
+        <a href="/admin/courses" class="nh-btn secondary">Назад</a>
+      </div>
+    </form>
+  </section>
 </div>
+<script>
+  (function () {
+    const input = document.getElementById("courseCover");
+    const preview = document.getElementById("courseCoverPreview");
+    if (!input || !preview) return;
+    input.addEventListener("change", () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      preview.style.backgroundImage = `url('${url}')`;
+    });
+  })();
+</script>
 {% endblock %}

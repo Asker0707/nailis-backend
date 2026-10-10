@@ -2,175 +2,401 @@
 
 {% block title %}{{ course.title }}{% endblock %}
 
+{% block extra_css %}
+  <link href="/static/css/pages/course-detail.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
-<div class="course-wrapper">
-  <!-- Фон -->
-  <div class="course-background"></div>
+{% set total_lessons = lessons|length if lessons else 0 %}
+{% set completed_count = lessons|selectattr('completed')|list|length if lessons else 0 %}
+{% set remaining_count = total_lessons - completed_count if total_lessons >= completed_count else 0 %}
+{% set next_lesson = lessons|rejectattr('completed')|list|first if lessons else none %}
+<div class="course-page" data-course-id="{{ course.id }}">
+  <div class="course-background" aria-hidden="true"></div>
+  <div class="course-glow course-glow-a" aria-hidden="true"></div>
+  <div class="course-glow course-glow-b" aria-hidden="true"></div>
 
-  <!-- Контент поверх фона -->
-  <div class="container lesson-section mt-5">
-    <!-- Заголовок -->
-    <div class="mb-5 fade-title text-center">
-      <h1 class="fw-bold display-4">
-        <i class="bi bi-journal-bookmark-fill text-primary"></i>
-        {{ course.title }}
-      </h1>
-      {% if course.description %}
-      <p class="lead text-muted">{{ course.description }}</p>
-      {% endif %}
-    </div>
-
-    <!-- Кнопка добавления урока -->
-    {% if is_admin %}
-    <div class="mb-4 text-center">
-      <a href="/admin/courses/{{ course.id }}/lessons/new" class="btn btn-lg btn-primary pulse">
-        <i class="bi bi-plus-lg"></i> Добавить урок
-      </a>
-    </div>
+  <section class="course-hero reveal-up" style="--delay: 30ms;">
+    <a href="/courses" class="hero-back"><i class="bi bi-arrow-left-short"></i> Назад к курсам</a>
+    <div class="hero-kicker">Внутри курса</div>
+    <h1 class="hero-title">{{ course.title }}</h1>
+    {% if course.description %}
+    <p class="hero-subtitle">{{ course.description }}</p>
+    {% else %}
+    <p class="hero-subtitle">Откройте уроки курса и продолжайте обучение без лишних переходов.</p>
     {% endif %}
 
-    <!-- Список уроков -->
-    {% if lessons %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="hero-stats">
+      <article class="hero-stat">
+        <strong>{{ total_lessons }}</strong>
+        <span>уроков</span>
+      </article>
+      <article class="hero-stat">
+        <strong>{{ completed_count }}</strong>
+        <span>пройдено</span>
+      </article>
+      <article class="hero-stat">
+        <strong>{{ remaining_count }}</strong>
+        <span>осталось</span>
+      </article>
+      <article class="hero-stat">
+        <strong>{% if has_access %}{% if lessons %}Доступно{% else %}Пусто{% endif %}{% else %}Закрыт{% endif %}</strong>
+        <span>{% if has_access %}с автопревью{% else %}до оплаты{% endif %}</span>
+      </article>
+    </div>
+
+    <div class="hero-actions">
+      {% if not has_access %}
+      <a href="{{ payment_url }}" class="hero-btn primary">
+        {% if course.price is not none %}Купить за {{ course.price|rub }}{% else %}Купить / открыть доступ{% endif %}
+      </a>
+      <a href="{{ telegram_buy_url }}" class="hero-btn secondary" target="_blank" rel="noopener">Написать в Telegram</a>
+      {% elif lessons %}
+      <a href="#lessonsGrid" class="hero-btn primary">Смотреть уроки</a>
+      {% endif %}
+      {% if has_access and next_lesson %}
+      <a href="/lessons/{{ next_lesson.id }}" class="hero-btn secondary">Продолжить курс</a>
+      {% endif %}
+      {% if is_admin %}
+      <a href="/admin/courses/{{ course.id }}/lessons/new" class="hero-btn secondary">
+        <i class="bi bi-plus-lg"></i> Добавить урок
+      </a>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if not has_access %}
+  <section class="course-lock-banner reveal-up" style="--delay: 120ms;">
+    <div class="lock-banner-icon"><i class="bi bi-lock-fill"></i></div>
+    <div class="lock-banner-copy">
+      <strong>Курс пока закрыт</strong>
+      <p>Можно посмотреть список уроков ниже. Видео, тексты, тест и домашка откроются после оплаты.</p>
+      {% if course.price is not none %}
+      <div class="course-lock-price">
+        <span>Стоимость</span>
+        <strong>{{ course.price|rub }}</strong>
+      </div>
+      {% endif %}
+    </div>
+    <a href="{{ payment_url }}" class="hero-btn primary">Перейти к оплате</a>
+  </section>
+  {% endif %}
+
+  <section class="course-toolbar reveal-up" style="--delay: 185ms;">
+    <label class="search-box" for="lessonSearch">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input
+        id="lessonSearch"
+        class="search-input"
+        type="search"
+        placeholder="Найти урок по названию"
+        autocomplete="off"
+      />
+    </label>
+
+    <div class="toolbar-side">
+      <span>Показано: <strong id="lessonsCount">{{ total_lessons }}</strong></span>
+      <button type="button" class="clear-btn" id="clearLessonSearch">Сбросить</button>
+    </div>
+  </section>
+
+  {% if lessons %}
+  <section class="lessons-section">
+    <div class="lessons-grid" id="lessonsGrid" aria-live="polite">
       {% for l in lessons %}
-      <div class="col">
-        <div class="card lesson-card h-100 fade-in" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
-          <a class="lesson-preview position-relative" href="/lessons/{{ l.id }}">
-            {% if l.video_path %}
-            <video src="/{{ l.video_path }}" autoplay loop muted playsinline class="lesson-preview-video"></video>
-            <div class="play-overlay"><i class="bi bi-play-circle-fill"></i></div>
+      {% set video_url = l.preview_url %}
+      {% set lesson_href = ('/lessons/' ~ l.id) if has_access else payment_url %}
+      {% set lesson_state = 'Пройден' if (has_access and l.completed) else ('В процессе' if (has_access and l.progress is defined and l.progress > 0) else ('Закрыт' if not has_access else 'Новый урок')) %}
+      <article
+        class="lesson-item reveal-up{% if not has_access %} is-locked{% endif %}"
+        data-lesson-card
+        data-search="{{ l.title|lower }}"
+        style="--delay: {{ 210 + loop.index0 * 40 }}ms;"
+      >
+        <div class="lesson-card{% if loop.first and lessons|length > 1 %} featured{% endif %}">
+          <div class="lesson-topline">
+            <span class="lesson-badge">Урок {{ "%02d"|format(loop.index) }}</span>
+            <span class="lesson-state{% if has_access and l.completed %} is-complete{% endif %}{% if not has_access %} is-locked{% endif %}">{{ lesson_state }}</span>
+          </div>
+
+          <a class="lesson-preview position-relative{% if not has_access %} is-locked{% endif %}" href="{{ lesson_href }}" aria-label="{% if has_access %}Открыть урок {{ l.title }}{% else %}Урок закрыт: {{ l.title }}{% endif %}">
+            {% if video_url %}
+              <video
+                data-preview-src="{{ video_url }}"
+                data-preview-limit="7"
+                muted
+                playsinline
+                preload="none"
+                loading="lazy"
+                class="lesson-preview-video"
+                poster="{{ l.poster_url if l.poster_url }}">
+                <source src="{{ video_url }}" type="video/mp4" />
+                Ваш браузер не поддерживает видео-превью.
+              </video>
+              {% if has_access %}
+              <div class="play-overlay" aria-hidden="true"><i class="bi bi-play-circle-fill"></i></div>
+              {% else %}
+              <div class="lock-overlay" aria-hidden="true"><i class="bi bi-lock-fill"></i></div>
+              {% endif %}
             {% else %}
-            <div class="text-muted small py-5">Видео отсутствует</div>
+              <div class="preview-fallback">
+                <i class="bi bi-{% if has_access %}camera-video-off{% else %}lock{% endif %}"></i>
+                <span>{% if has_access %}Видео отсутствует{% else %}Материалы после оплаты{% endif %}</span>
+              </div>
             {% endif %}
           </a>
-          <div class="card-body d-flex flex-column align-items-center text-center">
-            <h5 class="card-title mb-2">
-              <a href="/lessons/{{ l.id }}" class="lesson-title-link">{{ l.title }}</a>
-              {% if l.completed %}
-              <i class="bi bi-check-circle-fill text-success ms-2"></i>
+
+          <div class="card-body">
+            <h2 class="card-title">
+              {% if has_access %}
+              <a href="{{ lesson_href }}" class="lesson-title-link">{{ l.title }}</a>
+              {% else %}
+              <span class="lesson-title-link">{{ l.title }}</span>
               {% endif %}
-            </h5>
-            {% if l.progress is defined %}
-            <div class="progress w-75 mb-3">
-              <div class="progress-bar" role="progressbar" style="width: {{ l.progress }}%;" aria-valuenow="{{ l.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+              {% if has_access and l.completed %}
+              <i class="bi bi-check-circle-fill text-success ms-2" title="Урок пройден" aria-hidden="true"></i>
+              {% endif %}
+            </h2>
+
+            {% if has_access and l.progress is defined and l.progress > 0 and not l.completed %}
+            <div class="progress-wrapper">
+              <div class="progress-meta">
+                <span>Прогресс</span>
+                <strong>{{ l.progress }}%</strong>
+              </div>
+              <div class="progress" role="progressbar" aria-valuenow="{{ l.progress }}" aria-valuemin="0" aria-valuemax="100" aria-label="Прогресс урока">
+                <div class="progress-bar" style="width: {{ l.progress }}%;"></div>
+              </div>
             </div>
             {% endif %}
-            <div class="mt-auto d-flex flex-wrap gap-2 justify-content-center">
-              {% if l.video_path %}
-              <a href="/{{ l.video_path }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-camera-video"></i> Смотреть видео
-              </a>
+
+            {% if has_access or is_admin %}
+            <div class="card-actions" role="group" aria-label="Действия с уроком">
+              {% if has_access %}
+              <a href="{{ lesson_href }}" class="btn lesson-action-primary">Открыть</a>
               {% endif %}
-              <a href="/lessons/{{ l.id }}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-book"></i> Перейти к уроку
-              </a>
               {% if is_admin %}
-              <a href="/admin/lessons/{{ l.id }}/edit" class="btn btn-outline-warning btn-sm">
-                <i class="bi bi-pencil"></i> Редактировать
-              </a>
-              <a href="/admin/lessons/{{ l.id }}/delete" onclick="return confirm('Удалить урок?')" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-trash"></i> Удалить
-              </a>
+              <a href="/admin/lessons/{{ l.id }}/edit" class="btn lesson-action-warning">✎</a>
+              <form
+                action="/admin/lessons/{{ l.id }}/delete"
+                method="post"
+                class="d-inline"
+                data-confirm-title="Удалить урок?"
+                data-confirm-message="Урок и связанные данные будут удалены."
+                data-confirm-ok="Удалить"
+                data-confirm-cancel="Отмена"
+              >
+                <button type="submit" class="btn lesson-action-danger" aria-label="Удалить урок">🗑</button>
+              </form>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="search-empty" id="lessonSearchEmpty">
+      <i class="bi bi-search"></i> По этому запросу уроки не найдены. Попробуйте другой фрагмент названия.
+    </div>
+  </section>
+
+  <section class="course-finale reveal-up" style="--delay: 260ms;">
+    <div class="finale-head">
+      <div>
+        <span class="finale-kicker">Финал курса</span>
+        <h2>Финальное тестирование</h2>
+        <p>После завершения всех уроков откроется итоговый тест по программе, включая задание по строению ногтя.</p>
+      </div>
+
+      <div class="finale-progress">
+        <strong>{% if has_access %}{{ completed_count }}/{{ total_lessons }}{% else %}—{% endif %}</strong>
+        <span>уроков завершено</span>
+      </div>
+    </div>
+
+    {% if not has_access %}
+    <div class="finale-locked">
+      <div class="locked-icon"><i class="bi bi-lock"></i></div>
+      <div class="locked-copy">
+        <strong>Финал недоступен без оплаты</strong>
+        <p>Сначала откройте доступ к курсу — затем можно проходить уроки и сдавать тест.</p>
+      </div>
+      <a href="{{ payment_url }}" class="hero-btn secondary">Перейти к оплате</a>
+    </div>
+    {% elif course_completed %}
+    <div class="finale-grid">
+      <section class="finale-card">
+        <div class="finale-card-head">
+          <div>
+            <span class="finale-card-label">Финальный тест</span>
+            <h3>Проверь, насколько уверенно ты прошла программу</h3>
+          </div>
+          <span class="finale-pill">Порог: {{ assessment_pass_score }}/{{ assessment_total }}</span>
+        </div>
+
+        {% if assessment_total %}
+        <form id="courseAssessmentForm" class="assessment-form">
+          {% for question in assessment_questions %}
+          <fieldset class="question-card">
+            <legend>{{ loop.index }}. {{ question.prompt }}</legend>
+            <div class="question-options">
+              {% for option in question.options %}
+              <label class="option-item">
+                <input type="radio" name="{{ question.id }}" value="{{ option }}" required>
+                <span>{{ option }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+          {% endfor %}
+
+          <div class="finale-actions">
+            <button type="submit" class="hero-btn primary">Проверить результат</button>
+            <div class="finale-feedback" id="assessmentFormStatus">
+              {% if latest_attempt %}
+              Последняя попытка: {{ latest_attempt.score }}/{{ latest_attempt.total_questions }} · {% if latest_attempt.passed %}зачёт{% else %}есть ошибки{% endif %}
+              {% else %}
+              Ответь на все вопросы. Результат сохранится на сервере.
               {% endif %}
             </div>
           </div>
+        </form>
+        {% else %}
+        <div class="finale-empty">
+          <i class="bi bi-patch-question"></i>
+          <p>Для этого курса пока не удалось собрать финальный тест.</p>
         </div>
-      </div>
-      {% endfor %}
+        {% endif %}
+      </section>
+
+      <section class="finale-card">
+        <div class="finale-card-head">
+          <div>
+            <span class="finale-card-label">Домашняя работа</span>
+            <h3>Отправьте работу на проверку</h3>
+          </div>
+          <span class="finale-pill">PDF / фото / ссылка</span>
+        </div>
+
+        <form id="courseHomeworkForm" class="homework-form">
+          <label class="finale-field">
+            <span>Канал отправки</span>
+            <select name="delivery_channel" class="finale-input">
+              <option value="email">Email преподавателю</option>
+              <option value="telegram">Telegram</option>
+            </select>
+          </label>
+
+          <label class="finale-field">
+            <span>Ссылка на работу</span>
+            <input
+              type="url"
+              name="resource_url"
+              class="finale-input"
+              placeholder="https://disk.yandex.ru/..."
+            >
+          </label>
+
+          <label class="finale-field">
+            <span>Комментарий</span>
+            <textarea
+              name="message"
+              class="finale-textarea"
+              rows="4"
+              placeholder="Кратко опишите, что приложили и на что обратить внимание"
+            ></textarea>
+          </label>
+
+          <label class="finale-field">
+            <span>Файл (PDF, PNG, JPG, WEBP, ZIP)</span>
+            <input
+              type="file"
+              name="homework_file"
+              class="finale-input"
+              accept=".pdf,.png,.jpg,.jpeg,.webp,.zip,image/*,application/pdf,application/zip"
+            >
+          </label>
+
+          <div class="finale-actions">
+            <button type="submit" class="hero-btn primary">Отправить работу</button>
+            <div class="finale-feedback" id="homeworkFormStatus">
+              {% if latest_submission %}
+              Последняя отправка: {{ latest_submission.delivery_status }} · {{ latest_submission.created_at.strftime('%d.%m.%Y, %H:%M') if latest_submission.created_at else '' }}
+              {% else %}
+              Добавьте ссылку, описание или файл — отправим на проверку.
+              {% endif %}
+            </div>
+          </div>
+        </form>
+
+        <p class="finale-help-links">
+          Нужна помощь?
+          <a href="{{ telegram_buy_url }}?text={{ ('Здравствуйте! Вопрос по домашней работе курса «' ~ course.title ~ '».')|urlencode }}" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+          ·
+          <a href="/user/dashboard">Открыть кабинет</a>
+        </p>
+      </section>
+    </div>
+
+    <div class="finale-status-grid">
+      <article class="status-card-large" id="assessmentStatusCard">
+        <span class="status-card-label">Статус теста</span>
+        {% if latest_attempt %}
+        <strong>{{ latest_attempt.score }}/{{ latest_attempt.total_questions }}</strong>
+        <p>{% if latest_attempt.passed %}Последняя попытка засчитана.{% else %}Последняя попытка сохранена, можно пройти тест ещё раз.{% endif %}</p>
+        <span class="status-card-meta">{{ latest_attempt.created_at }}</span>
+        {% else %}
+        <strong>Ещё не пройден</strong>
+        <p>Тест открылся. После отправки результат сохранится здесь.</p>
+        {% endif %}
+      </article>
+
+      <article class="status-card-large" id="homeworkStatusCard">
+        <span class="status-card-label">Статус домашней работы</span>
+        {% if latest_submission %}
+        <strong>{{ latest_submission.delivery_status }}</strong>
+        <p>
+          Канал: {{ latest_submission.delivery_channel }}
+          {% if latest_submission.resource_url %} · есть ссылка{% endif %}
+          {% if latest_submission.submission_path %} · файл приложен{% endif %}
+        </p>
+        <span class="status-card-meta">{{ latest_submission.created_at.strftime('%d.%m.%Y, %H:%M') if latest_submission.created_at else '' }}</span>
+        {% else %}
+        <strong>Ещё не отправлена</strong>
+        <p>После отправки статус появится здесь.</p>
+        {% endif %}
+      </article>
     </div>
     {% else %}
-    <p class="mt-4 text-muted text-center">Уроки ещё не добавлены.</p>
-    {% if is_admin %}
-    <div class="text-center">
-      <a href="/admin/courses/{{ course.id }}/lessons/new" class="btn btn-lg btn-primary pulse">
-        <i class="bi bi-plus-lg"></i> Добавить первый урок
-      </a>
+    <div class="finale-locked">
+      <div class="locked-icon"><i class="bi bi-lock"></i></div>
+      <div class="locked-copy">
+        <strong>Финальный блок пока закрыт</strong>
+        <p>Осталось пройти {{ remaining_count }} {% if remaining_count == 1 %}урок{% elif remaining_count < 5 %}урока{% else %}уроков{% endif %}. После этого здесь откроются тест и форма сдачи домашнего задания.</p>
+      </div>
+      {% if next_lesson %}
+      <a href="/lessons/{{ next_lesson.id }}" class="hero-btn secondary">Перейти к следующему уроку</a>
+      {% endif %}
     </div>
     {% endif %}
+  </section>
+  {% else %}
+  <div class="empty-state reveal-up" style="--delay: 220ms;">
+    <i class="bi bi-journal-x"></i>
+    <p>Уроки ещё не добавлены.</p>
+    {% if is_admin %}
+    <a href="/admin/courses/{{ course.id }}/lessons/new" class="hero-btn primary mt-2">
+      <i class="bi bi-plus-lg"></i> Добавить первый урок
+    </a>
     {% endif %}
   </div>
+  {% endif %}
 </div>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-/* --- Контейнер --- */
-.course-wrapper { position: relative; }
-
-/* --- Фон --- */
-.course-background {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: radial-gradient(circle, rgba(255,200,180,0.15) 1px, transparent 1px),
-              radial-gradient(circle, rgba(180,220,255,0.15) 1px, transparent 1px),
-              radial-gradient(circle, rgba(255,255,180,0.15) 1px, transparent 1px);
-  background-size: 30px 30px, 50px 50px, 70px 70px;
-  z-index:0;
-  pointer-events:none;
-  animation: moveStars 60s linear infinite;
-}
-@keyframes moveStars {
-  0% { background-position: 0 0, 0 0, 0 0; }
-  50% { background-position: 400px 200px, -300px 150px, 250px -200px; }
-  100% { background-position: 0 0, 0 0, 0 0; }
-}
-
-/* --- Контент --- */
-.lesson-section { position: relative; z-index:1; }
-
-/* Заголовок */
-.fade-title { opacity:0; transform:translateY(-30px); animation: fadeSlideDown 1s forwards; }
-@keyframes fadeSlideDown { to { opacity:1; transform:translateY(0); } }
-
-/* --- Карточки --- */
-.lesson-card {
-  position: relative;
-  z-index:1;
-  border-radius:2rem;
-  overflow:hidden;
-  background: linear-gradient(145deg,#fffaf2,#fdf2e6);
-  box-shadow:0 18px 40px rgba(0,0,0,0.12), inset 0 0 15px rgba(255,255,255,0.2);
-  backdrop-filter:blur(12px);
-  border:1px solid rgba(163,107,94,0.2);
-  opacity:0;
-  transform:translateY(20px);
-  transition: transform 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
-  animation: fadeInUp 0.9s forwards;
-}
-.lesson-card:hover {
-  transform:translateY(-15px) rotateX(2deg) rotateY(2deg) scale(1.02);
-  box-shadow:0 28px 60px rgba(0,0,0,0.18),0 0 15px rgba(255,200,150,0.3);
-  background:linear-gradient(145deg,#ffe8d8,#fdded0);
-}
-@keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
-
-/* Видео */
-.lesson-preview { position: relative; width:100%; overflow:hidden; border-radius:1.2rem; }
-.lesson-preview-video { width:100%; max-height:180px; object-fit:cover; border-radius:1.2rem; transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease; }
-.lesson-preview-video:hover { transform:scale(1.15) rotateZ(0.5deg); box-shadow:0 22px 38px rgba(0,0,0,0.28); filter:brightness(1.08) saturate(1.08); }
-.play-overlay { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:3rem; color:rgba(255,255,255,0.8); pointer-events:none; transition: all 0.3s; }
-.lesson-preview:hover .play-overlay { color:#ff8f70; transform:translate(-50%,-50%) scale(1.25); }
-
-/* Заголовки и кнопки */
-.lesson-card .card-title { font-family:'Poppins',sans-serif; font-weight:700; font-size:1.55rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; }
-.lesson-title-link { color:#a36b5e; text-decoration:none; transition: color 0.3s, text-shadow 0.3s; }
-.lesson-title-link:hover { color:#7b5a50; text-shadow:0 0 6px rgba(255,150,120,0.6); text-decoration:underline; }
-
-.progress { height:6px; border-radius:3px; background:#e4d5c3; }
-.progress-bar { background:#a36b5e; transition: width 0.6s ease; }
-
-.lesson-card .btn { font-size:1rem; padding:0.5rem 1.3rem; border-radius:2rem;
-  backdrop-filter: blur(6px); border:1px solid #a36b5e; color:#a36b5e; background: rgba(255,255,255,0.35);
-  transition: all 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease; }
-.lesson-card .btn:hover { background:linear-gradient(135deg,#a36b5e,#ff8f70); color:#fff;
-  box-shadow:0 0 15px 4px rgba(255,140,100,0.55); transform:translateY(-2px) scale(1.05); }
-.lesson-card .btn:focus { outline:none; }
-
-/* Пульсация кнопки "Добавить" */
-.pulse { animation: pulse 2s infinite; }
-@keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(163,107,94,0.5);} 70%{box-shadow:0 0 0 16px rgba(163,107,94,0);} 100%{box-shadow:0 0 0 0 rgba(163,107,94,0);} }
-
-/* Адаптив */
-@media(max-width:768px){ .lesson-card .card-title{ font-size:1.35rem; } .lesson-preview-video{ max-height:150px; } }
-</style>
+{% block extra_js %}
+  <script id="assessmentPayload" type="application/json">{{ assessment_payload|tojson }}</script>
+  <script src="/static/js/course-detail.js" defer></script>
 {% endblock %}

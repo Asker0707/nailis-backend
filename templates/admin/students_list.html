@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Ученики | Nailis.hub{% endblock %}
+
+{% block content %}
+<div class="nh-page admin-page">
+  <header class="nh-surface admin-hero reveal-up">
+    <span class="nh-kicker">Админка</span>
+    <h1>Ученики</h1>
+    <p>Все зарегистрированные ученики сразу в списке. Поиск фильтрует по имени или email.</p>
+  </header>
+
+  <section class="nh-surface admin-panel reveal-up" style="--delay: 40ms;" data-students-panel>
+    <div class="admin-toolbar mb-3">
+      <h2>Список <span class="text-muted fw-normal" data-students-count>({{ students|length }})</span></h2>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="/admin/courses" class="nh-btn secondary">К курсам</a>
+      </div>
+    </div>
+
+    <div class="admin-form mb-3" style="max-width: 520px;">
+      <label class="form-label" for="studentSearch">Поиск</label>
+      <div class="d-flex gap-2">
+        <input
+          id="studentSearch"
+          type="search"
+          class="form-control"
+          value="{{ q or '' }}"
+          placeholder="Начните вводить имя или email"
+          autocomplete="off"
+          data-students-search
+        >
+        <button type="button" class="nh-btn secondary" data-students-clear hidden>Сбросить</button>
+      </div>
+      <p class="form-text mb-0 mt-2" data-students-hint>
+        Показаны все зарегистрированные ученики{% if students %} · всего {{ students|length }}{% endif %}.
+      </p>
+    </div>
+
+    {% if students %}
+    <div class="students-table-wrap table-responsive">
+      <table class="table admin-table align-middle" data-students-table>
+        <thead>
+          <tr>
+            <th>Ученик</th>
+            <th>Email</th>
+            <th>Регистрация</th>
+            <th>Выданные курсы</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr
+            data-student-row
+            data-search="{{ ((student.full_name or '') ~ ' ' ~ student.email)|lower }}"
+          >
+            <td><strong>{{ student.full_name or 'Без имени' }}</strong></td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.created_at.strftime('%d.%m.%Y') if student.created_at else '—' }}</td>
+            <td>{{ access_counts.get(student.id, 0) }}</td>
+            <td>
+              <a href="/admin/students/{{ student.id }}" class="nh-btn primary">Доступы</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-empty" data-students-empty hidden>
+      <p class="mb-0">По запросу никого не найдено. Сбросьте поиск, чтобы снова увидеть весь список.</p>
+    </div>
+    {% else %}
+    <div class="admin-empty">
+      <p class="mb-0">Зарегистрированных учеников пока нет.</p>
+    </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(() => {
+  const panel = document.querySelector("[data-students-panel]");
+  if (!panel) return;
+
+  const input = panel.querySelector("[data-students-search]");
+  const clearBtn = panel.querySelector("[data-students-clear]");
+  const rows = [...panel.querySelectorAll("[data-student-row]")];
+  const empty = panel.querySelector("[data-students-empty]");
+  const countEl = panel.querySelector("[data-students-count]");
+  const hint = panel.querySelector("[data-students-hint]");
+  const total = rows.length;
+
+  const applyFilter = () => {
+    const q = (input?.value || "").trim().toLowerCase();
+    let visible = 0;
+    rows.forEach((row) => {
+      const hay = row.getAttribute("data-search") || "";
+      const show = !q || hay.includes(q);
+      row.hidden = !show;
+      if (show) visible += 1;
+    });
+    if (empty) empty.hidden = visible !== 0;
+    if (countEl) countEl.textContent = q ? `(${visible} из ${total})` : `(${total})`;
+    if (clearBtn) clearBtn.hidden = !q;
+    if (hint) {
+      hint.textContent = q
+        ? `Фильтр: «${input.value.trim()}» · найдено ${visible} из ${total}.`
+        : `Показаны все зарегистрированные ученики · всего ${total}.`;
+    }
+  };
+
+  input?.addEventListener("input", applyFilter);
+  clearBtn?.addEventListener("click", () => {
+    if (!input) return;
+    input.value = "";
+    input.focus();
+    applyFilter();
+  });
+
+  applyFilter();
+})();
+</script>
+{% endblock %}

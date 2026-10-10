@@ -1,320 +1,1043 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Nailis Hub — динамичная верстка</title>
+{% extends "base.html" %}
+{% block title %}Главная | Nailis.hub{% endblock %}
+{% block body_class %}page-home{% endblock %}
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap"
-  rel="stylesheet"
-/>
+{% block extra_css %}
+  <link href="/static/css/index-page.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
+  <link href="/static/vendor/lenis.css" rel="stylesheet" />
+  <link href="/static/css/home-motion.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
+  <link href="/static/css/home-tariffs.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
+  <link href="/static/css/home-reviews.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
+{% endblock %}
 
-<style>
-:root {
-  --accent: #c99a6b;
-  --dark: #1a120b;
-  --muted: #7f776f;
-  --bg-light: #fefcfb;
-  --max-width: 1200px;
-
-  --hero-height: 590px;
-  --hero-overlay: 0.18;
-  --hero-offset: 140px;
-
-  --about-overlap: 160px;
-  --about-into-text: 100px;
-  --about-card-width: 420px;
-  --about-card-height: 540px;
-
-  --transition: 0.35s ease-in-out;
-}
-
-* { box-sizing: border-box; }
-html, body { height: 100%; scroll-behavior: smooth; }
-body {
-  margin: 0;
-  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color: var(--dark);
-  background: var(--bg-light);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
-}
-img { display: block; max-width: 100%; height: auto; border-radius: 8px; transition: transform var(--transition);}
-img:hover { transform: scale(1.02); }
-
-.container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
-
-/* HEADER */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 120;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-.topbar {
-  display: flex; align-items: center; justify-content: space-between; padding: 12px 0;
-}
-.logo { font-family:"Playfair Display", serif; font-weight:700; font-size:26px; color: var(--dark); letter-spacing:1px;}
-.logo span { color: var(--accent);}
-nav { display:flex; gap:18px; align-items:center; }
-nav a { color: var(--muted); font-weight:600; font-size:14px; text-decoration:none; position: relative;}
-nav a::after {
-  content:""; position:absolute; left:0; bottom:-4px; width:0; height:2px; background:var(--accent); transition: width var(--transition);
-}
-nav a:hover::after { width:100%; }
-nav a:hover { color: var(--accent); }
-
-/* HERO */
-.hero {
-  position: relative;
-  background-color: #85817e;
-  background-image: url("static/images/hero.png");
-  background-position: calc(100% - var(--hero-offset)) center;
-  background-repeat: no-repeat;
-  overflow: hidden;
-  min-height: var(--hero-height);
-  display: flex;
-  align-items: center;
-  transition: background-position 0.5s ease;
-}
-.hero::after {
-  content:""; position:absolute; inset:0;
-  background: linear-gradient(180deg, rgba(0,0,0,var(--hero-overlay)) 0%, rgba(0,0,0,0.07) 60%);
-  pointer-events:none;
-}
-.hero-inner {
-  position: relative; z-index:2; max-width: var(--max-width); margin:0 auto; width:100%;
-  padding:18px 24px;
-  display: grid; grid-template-columns:46% 54%; gap:20px; align-items:center;
-}
-.hero-left { color:#fff; max-width:640px; }
-.eyebrow { font-size:12px; color:rgba(255,255,255,0.9); letter-spacing:2px; margin-bottom:12px;}
-.hero-left h1 { margin:0 0 16px 0; font-family:"Playfair Display", serif; font-size:48px; line-height:1.05; text-shadow:0 6px 18px rgba(0,0,0,0.35);}
-.hero-left p { margin:0 0 22px 0; font-size:17px; color: rgba(255,255,255,0.95);}
-.cta {
-  display:inline-block; background: rgba(0,0,0,0.75); color:#fff; padding:14px 24px; border-radius:6px;
-  font-weight:700; letter-spacing:0.6px; text-transform:uppercase;
-  transition: background var(--transition), transform var(--transition);
-}
-.cta:hover { background:var(--accent); color:var(--dark); transform: translateY(-2px); }
-
-/* ABOUT */
-.about {
-  max-width: var(--max-width);
-  margin:0 auto;
-  padding:60px 24px 100px;
-  display:grid;
-  grid-template-columns: var(--about-card-width) 1fr;
-  gap:40px;
-  align-items: start;
-  position: relative;
-}
-.about-card {
-  position: relative;
-  width: var(--about-card-width);
-  height: var(--about-card-height);
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 18px 45px rgba(0,0,0,0.14);
-  background: #fefcfb;
-  margin-top: calc(-1 * var(--about-overlap));
-  margin-right: calc(-1 * var(--about-into-text));
-  z-index:6;
-  transition: transform var(--transition);
-}
-.about-card:hover { transform: translateY(-8px); }
-.label-vertical {
-  position:absolute; left:14px; top:50%; transform: translateY(-50%) rotate(-90deg);
-  transform-origin:left top; font-family:"Playfair Display", serif; letter-spacing:6px; color:rgba(255,255,255,0.9);
-  font-size:18px; opacity:0.7; pointer-events:none; text-shadow:0 2px 8px rgba(0,0,0,0.25);
-}
-.about-body { padding:6px 0; }
-.about-body h2 { font-family:"Playfair Display", serif; font-size:34px; margin:6px 0 18px; color:var(--dark);}
-.about-body p { color:#6b635e; font-size:16px; margin:0 0 14px; line-height:1.65; }
-.signature { margin-top:18px; }
-.signature .name { font-family:"Playfair Display", serif; font-size:18px; color: var(--dark);}
-.signature .role { color: var(--muted); font-size:13px; }
-
-/* INFO ROW */
-.info-row {
-  max-width: var(--max-width); margin:36px auto 120px; padding:0 24px;
-  display:grid; grid-template-columns:1fr 1fr; gap:32px;
-}
-.hours {
-  background:#fff; padding:26px; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.06);
-  transition: transform var(--transition);
-}
-.hours:hover { transform: translateY(-4px);}
-.hours h3 { font-family:"Playfair Display", serif; margin:0 0 12px 0; color: var(--dark);}
-.hours p { margin:6px 0; color:#6b635e; font-weight:600; }
-.studio img { border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,0.08); }
-
-/* FOOTER */
-footer { padding:28px 24px; text-align:center; color:#8b8682; border-top:1px solid #eee; background:#fff; }
-
-/* ANIMATION ON SCROLL */
-.scroll-anim {
-  opacity:0;
-  transform: translateY(40px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.scroll-anim.show { opacity:1; transform: translateY(0); }
-
-/* RESPONSIVE */
-@media (max-width:900px){
-  .hero { min-height:360px; }
-  .hero-inner { grid-template-columns:1fr; padding:28px; text-align:center; }
-  .hero-left { order:2; }
-  .hero-left h1 { font-size:32px; }
-  .about { grid-template-columns:1fr; padding:28px; gap:24px; }
-  .about-card { position:static; margin:0 auto; width:80%; height:420px; }
-  .about-body { text-align:center; }
-  .info-row { grid-template-columns:1fr; gap:18px; }
-}
-@media (max-width:480px){
-  .hero-left h1 { font-size:26px; }
-  .hero-left p { font-size:15px; }
-}
-</style>
-</head>
-<body>
-
-<header>
-  <div class="container topbar">
-    <div class="logo">Nail<span>Hub</span></div>
-    <nav aria-label="Главное меню">
-      <a href="#">Главная</a>
-      <a href="#about">О нас</a>
-      <a href="/courses">Курсы</a>
-      <a href="/auth/login">Войти</a>
-    </nav>
+{% block content %}
+{# Форма «Перезвоните мне» требует сервера (/api/callback). В статической сборке
+   (deploy/landing) её нет — остаются кнопки Telegram и Instagram. #}
+{% set show_callback = not static_site %}
+{% macro home_marquee() -%}
+<div class="home-marquee" aria-hidden="true">
+  <div class="home-marquee-track">
+    {% for _ in range(2) %}
+    <div class="home-marquee-group">
+      {% for __ in range(12) %}
+      <span class="home-marquee-item">ЕШЬ</span>
+      <span class="home-marquee-sep">·</span>
+      <span class="home-marquee-item">ЛЮБИ</span>
+      <span class="home-marquee-sep">·</span>
+      <span class="home-marquee-item">ПИЛИ</span>
+      <span class="home-marquee-sep">·</span>
+      {% endfor %}
+    </div>
+    {% endfor %}
   </div>
-</header>
+</div>
+{%- endmacro %}
+<div class="home-shell home-shell-v2">
+  <section class="hero hero-bleed">
+    <div class="hero-bleed-media" aria-hidden="true">
+      <div class="hero-tape" data-hero-tape>
+        <div class="hero-tape-track">
+          {% set hero_clips = hero_clips or [] %}
+          {# Two copies for seamless loop; sources from static/videos/lenta #}
+          {% if hero_clips %}
+          {% for _ in range(2) %}
+            {% for clip in hero_clips %}
+            <div class="hero-tape-item">
+              <video
+                class="hero-tape-video"
+                muted
+                loop
+                playsinline
+                preload="none"
+                {% if clip.poster %}poster="{{ clip.poster }}"{% endif %}
+                data-src="{{ clip.src }}"
+              ></video>
+            </div>
+            {% endfor %}
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      <div class="hero-bleed-veil"></div>
+    </div>
 
-<main>
-<section class="hero scroll-anim" aria-label="Главный баннер">
-  <div class="hero-inner">
-    <div class="hero-left">
-      <div class="eyebrow">TRENDY SALON & SPA</div>
-      <h1>Больше чем просто<br>Красивый маникюр</h1>
-      <p>
-        Профессиональный маникюр, френч и авторские техники — обучение онлайн и в студии. Подчеркни свою красоту вместе с Nailis Hub.
+    <div class="hero-bleed-copy">
+      <p class="hero-brand" translate="no">Nailis.hub</p>
+      <h1 class="hero-title">
+        Индивидуальное <span class="hero-title-nowrap">обучение маникюру</span>
+      </h1>
+      <p class="hero-lead">
+        Очные занятия один на один. Практика на моделях и поддержка после курса.
       </p>
-      <a class="cta" href="/auth/register">Начать обучение</a>
+      {% if user %}
+      <div class="hero-actions">
+        <a href="/user/dashboard" class="home-btn primary">Перейти в кабинет</a>
+      </div>
+      {% endif %}
+      <a href="#formats" class="hero-tariffs-link">
+        <span>Смотреть тарифы</span>
+        <i class="bi bi-arrow-down" aria-hidden="true"></i>
+      </a>
     </div>
-    <div></div>
-  </div>
-</section>
+  </section>
 
-<section id="about" class="about scroll-anim" aria-labelledby="about-title">
-  <div class="about-card" aria-hidden="true">
-    <img src="static/images/hero11.jpg" alt="Олеся - мастер">
-    <div class="label-vertical">HAIR LOUNGE</div>
-  </div>
-  <div class="about-body">
-    <h2 id="about-title">About Us</h2>
-    <p>
-      Привет! Я Олеся — практикующий мастер ногтевого сервиса. За 5 лет в индустрии я выстроила авторскую методику френча и комплексных техник, которые помогают моим ученикам быстро выйти на стабильный доход и уверенность в своих силах.
-    </p>
-    <p>
-      На платформе Nailis Hub вы найдёте понятные пошаговые курсы, записи живых занятий и персональные разборы ошибок — всё, чтобы стать мастером, которого выбирают.
-    </p>
-    <div class="signature">
-      <div class="name">Mayline</div>
-      <div class="role">James Hansen — Director</div>
-    </div>
-  </div>
-</section>
 
-<section class="info-row scroll-anim" aria-label="Информация">
-  <div class="hours">
-    <h3>Opening Hours</h3>
-    <p>MONDAY — FRIDAY: 9AM - 22PM</p>
-    <p>SATURDAY: 10AM - 19PM</p>
-    <p>SUNDAY: 10AM - 19PM</p>
-  </div>
-  <div class="studio">
-    <h3>Наша студия</h3>
-    <img src="static/images/2147878838.jpg" alt="Фото студии">
-  </div>
-</section>
+  <section class="home-section about-section about-section-v2" data-reveal>
+    <div class="about-grid">
+      <div class="about-portrait about-portrait--layered" data-depth-scene>
+        <div class="about-depth-back" aria-hidden="true" data-depth="-0.35">
+          <span class="about-depth-word" translate="no">Nailis</span>
+        </div>
+        <div class="about-depth-arch" aria-hidden="true" data-depth="-0.12"></div>
+        <img class="about-depth-figure" src="/static/images/01_24_56-Photoroom.png?v=1" alt="Олеся Дышекова" width="853" height="1280" loading="lazy" decoding="async" data-depth="0.08" />
+      </div>
+      <div class="about-copy">
+        <div class="section-head">
+          <div>
+            <span class="kicker">Об Инструкторе</span>
+            <h2><span class="about-title-line">Олеся Дышекова — мастер</span><br>и наставник</h2>
+          </div>
+        </div>
+        <p class="about-lead">
+          Пять лет практики и своя клиентская база. Учу точной технике, чистому маникюру
+          и покрытию, за которое не стыдно поднять чек.
+        </p>
+        <p class="about-lead about-lead-soft">
+          Это обучение для тех, кто хочет расти в профессии — а не «попробовать ради галочки».
+        </p>
 
-<!-- COURSES SECTION -->
-<section id="courses" class="scroll-anim" style="padding:80px 24px; max-width: var(--max-width); margin:0 auto;">
-  <h2 style="font-family:'Playfair Display', serif; font-size:34px; color:var(--dark); margin-bottom:36px; text-align:center;">Наши курсы</h2>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:28px;">
-    <div style="background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 8px 25px rgba(0,0,0,0.08); transition:transform var(--transition);">
-      <img src="static/images/2147878838.jpg" alt="Курс 1">
-      <div style="padding:16px;">
-        <h3 style="margin:0 0 8px 0; font-family:'Playfair Display', serif; font-size:20px;">Авторский френч</h3>
-        <p style="font-size:14px; color:#6b635e; margin:0 0 12px;">Освой авторские техники французского маникюра за 4 недели.</p>
-        <a href="#" style="display:inline-block; padding:8px 16px; background:var(--accent); color:#fff; border-radius:6px; text-decoration:none; font-weight:600;">Подробнее</a>
+        <div class="about-certs" data-certs-gallery aria-label="Сертификаты">
+          <p class="about-certs-label">Мои работы</p>
+          <div class="about-certs-grid" data-certs-deck>
+
+            <button type="button" class="about-cert-item" data-cert-open>
+              <img src="/static/images/my_work2.jpg" alt="Работа 2" width="737" height="1280" loading="lazy" decoding="async" />
+            </button>
+            <button type="button" class="about-cert-item" data-cert-open>
+              <img src="/static/images/my_work5.jpg" alt="Работа 5" width="720" height="1280" loading="lazy" decoding="async" />
+            </button>
+            <button type="button" class="about-cert-item" data-cert-open>
+              <img src="/static/images/my_work3.jpg" alt="Работа 3" width="720" height="1280" loading="lazy" decoding="async" />
+            </button>
+            <button type="button" class="about-cert-item" data-cert-open>
+              <img src="/static/images/my_work8.jpg" alt="Работа 8" width="891" height="1280" loading="lazy" decoding="async" />
+            </button>
+            <button type="button" class="about-cert-item" data-cert-open>
+              <img src="/static/images/my_work4.jpg" alt="Работа 4" width="720" height="1280" loading="lazy" decoding="async" />
+            </button>
+
+            <button type="button" class="about-cert-item" data-cert-open>
+              <img src="/static/images/my_work6.jpg" alt="Работа 6" width="965" height="1280" loading="lazy" decoding="async" />
+            </button>
+
+
+          </div>
+        </div>
       </div>
     </div>
-    <div style="background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 8px 25px rgba(0,0,0,0.08); transition:transform var(--transition);">
-      <img src="static/images/2147878838.jpg" alt="Курс 2">
-      <div style="padding:16px;">
-        <h3 style="margin:0 0 8px 0; font-family:'Playfair Display', serif; font-size:20px;">Комбинированный маникюр</h3>
-        <p style="font-size:14px; color:#6b635e; margin:0 0 12px;">Изучи современные техники комбинированного маникюра и ухода за ногтями.</p>
-        <a href="#" style="display:inline-block; padding:8px 16px; background:var(--accent); color:#fff; border-radius:6px; text-decoration:none; font-weight:600;">Подробнее</a>
+
+    <dialog class="cert-lightbox" data-cert-lightbox aria-label="Просмотр работ">
+      <button type="button" class="cert-lightbox-close" data-cert-close aria-label="Закрыть">×</button>
+      <button type="button" class="cert-lightbox-nav is-prev" data-cert-prev aria-label="Предыдущая работа">
+        <span aria-hidden="true">‹</span>
+      </button>
+      <figure class="cert-lightbox-stage">
+        <img alt="Работа" width="720" height="1280" data-cert-lightbox-img />
+        <figcaption class="cert-lightbox-count" data-cert-count aria-live="polite"></figcaption>
+      </figure>
+      <button type="button" class="cert-lightbox-nav is-next" data-cert-next aria-label="Следующая работа">
+        <span aria-hidden="true">›</span>
+      </button>
+    </dialog>
+  </section>
+
+
+  <section class="home-section overview-section overview-compact" data-reveal>
+    <div class="overview-layout">
+      <div class="section-head">
+        <div>
+          <span class="kicker">Почему я</span>
+          <h2>Что вы получите после обучения</h2>
+        </div>
+      </div>
+
+      <ul class="benefit-list" data-benefits>
+        <li class="benefit">
+          <span class="benefit-rule" aria-hidden="true"></span>
+          <span class="benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12"/><path d="M11 11.5V4a1.5 1.5 0 0 1 3 0v7.5"/><path d="M14 11.5V5.5a1.5 1.5 0 0 1 3 0V14a7 7 0 0 1-7 7h-.5a6 6 0 0 1-4.6-2.2L3.6 16a1.6 1.6 0 0 1 2.4-2.1L8 16"/></svg></span>
+          <div class="benefit-copy">
+            <h3>Практика и техника</h3>
+            <p>Система под результат: постановка руки, чистота и покрытие уровня «дорого».</p>
+          </div>
+        </li>
+        <li class="benefit">
+          <span class="benefit-rule" aria-hidden="true"></span>
+          <span class="benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 0 1-11.7 7.1L4 20l1-3.9A8 8 0 1 1 20 12Z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>
+          <div class="benefit-copy">
+            <h3>Обратная связь 3&nbsp;месяца</h3>
+            <p>Можно присылать работы, задавать вопросы и спокойно закреплять навык после курса.</p>
+          </div>
+        </li>
+        <li class="benefit">
+          <span class="benefit-rule" aria-hidden="true"></span>
+          <span class="benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.3-2h6l1.3 2h1.2A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5Z"/><circle cx="12" cy="12.5" r="3.5"/></svg></span>
+          <div class="benefit-copy">
+            <h3>Портфолио и соцсети</h3>
+            <p>Помогаю с фото работ и подачей профиля, чтобы привлекать клиентов и расти в чеке.</p>
+          </div>
+          <span class="benefit-rule benefit-rule--end" aria-hidden="true"></span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {{ home_marquee() }}
+
+  <section class="home-section" id="formats" data-reveal>
+    <div class="section-head">
+      <div>
+        <span class="kicker">Тарифы</span>
+        <h2>Выбери свой формат</h2>
       </div>
     </div>
-    <div style="background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 8px 25px rgba(0,0,0,0.08); transition:transform var(--transition);">
-      <img src="static/images/2147878838.jpg" alt="Курс 3">
-      <div style="padding:16px;">
-        <h3 style="margin:0 0 8px 0; font-family:'Playfair Display', serif; font-size:20px;">Нейл-арт мастерство</h3>
-        <p style="font-size:14px; color:#6b635e; margin:0 0 12px;">Творческие техники нейл-арта для начинающих и продвинутых мастеров.</p>
-        <a href="#" style="display:inline-block; padding:8px 16px; background:var(--accent); color:#fff; border-radius:6px; text-decoration:none; font-weight:600;">Подробнее</a>
+
+    <div class="tariff-grid" data-tariff-grid>
+      <article class="tariff-card tariff-card--dark" data-tariff-card data-tariff-id="junior">
+        <div class="tariff-chips"><span class="tariff-chip">Офлайн</span><span class="tariff-chip">3&nbsp;дня</span><span class="tariff-chip">Для новичков</span></div>
+        <p class="tariff-name" translate="no">Junior</p>
+        <h3 class="tariff-title">Базовый курс</h3>
+        <div class="tariff-price">
+          <span class="tariff-price-value" data-tariff-price>{{ "{:,}".format(40000).replace(",", " ") }}&nbsp;₽</span>
+          <a class="tariff-monthly" href="#installment-calc">от&nbsp;{{ "{:,}".format((40000 * 1.086 / 6) | round | int).replace(",", " ") }}&nbsp;₽/мес · оплата частями</a>
+        </div>
+        <ul class="tariff-points">
+            <li><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Именной сертификат</span></li>
+            <li><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Обратная связь 3&nbsp;месяца</span></li>
+            <li><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Стартовое портфолио с вашими отработками</span></li>
+        </ul>
+        <div class="tariff-actions">
+          <button type="button" class="tariff-btn tariff-btn--main" data-tariff-open data-tariff-badge="Офлайн" data-tariff-duration="3&nbsp;дня" data-tariff-status="Для новичков" data-tariff-title="Junior — Базовый курс" data-tariff-cta-text="Добрый день! Хочу записаться на курс «Junior — Базовый курс»">Программа курса</button>
+          <a class="tariff-link" href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс «Junior — Базовый курс»'|urlencode }}" target="_blank" rel="noopener noreferrer">Записаться в&nbsp;<span translate="no">Telegram</span></a>
+        </div>
+        <template data-tariff-detail>
+          <section class="tariff-program-day" data-day="1" data-tab="День 1">
+            <div class="tariff-day-head">
+              <span class="tariff-day-num">01</span>
+              <div>
+                <h4>Теория / практика</h4>
+                <p class="tariff-day-meta">1&nbsp;день · 11:00~19:00</p>
+              </div>
+            </div>
+            <ul>
+              <li>Инструменты для работы</li>
+              <li>Дезинфекция и стерилизация</li>
+              <li>Материаловедение (свойства баз, гелей, акригелей, топов)</li>
+              <li>«Мучительные отслойки»</li>
+              <li>Отработка на типсах</li>
+              <li>Отработка на своей руке</li>
+            </ul>
+          </section>
+
+          <section class="tariff-program-day" data-day="2" data-tab="День 2">
+            <div class="tariff-day-head">
+              <span class="tariff-day-num">02</span>
+              <div>
+                <h4>Теория / практика</h4>
+                <p class="tariff-day-meta">2 день · 11:00~19:00</p>
+              </div>
+            </div>
+            <ul>
+              <li>Строение ногтя</li>
+              <li>Слои ногтевой пластины</li>
+              <li>Виды ногтевых пластин</li>
+              <li>Виды кутикул и их особенности</li>
+              <li>Отработка на модели (снятие материала, комбинированный маникюр, опил формы «квадрат», покрытие гелем)</li>
+            </ul>
+          </section>
+
+          <section class="tariff-program-day" data-day="3" data-tab="День 3">
+            <div class="tariff-day-head">
+              <span class="tariff-day-num">03</span>
+              <div>
+                <h4>Теория / практика</h4>
+                <p class="tariff-day-meta">3 день · 11:00~19:00</p>
+              </div>
+            </div>
+            <ul>
+              <li>Заболевания ногтевой пластины</li>
+              <li>Отработка на модели (снятие материала, комбинированный маникюр, опил формы «миндаль», покрытие гелем)</li>
+              <li>Вручение сертификата</li>
+            </ul>
+          </section>
+
+          <section class="tariff-program-day tariff-program-day--bonus" data-tab="Бонусы">
+            <div class="tariff-day-head">
+              <span class="tariff-day-num">+</span>
+              <div>
+                <h4>Бонус</h4>
+                <p class="tariff-day-meta">Материалы в подарок</p>
+              </div>
+            </div>
+            <ul>
+              <li>«Пособие по маникюру для начинающих» в электронном виде</li>
+              <li>Набор материалов для начинающего</li>
+              <li>Скидка 10&nbsp;% на продукцию бренда <span translate="no">MILK</span> по промокоду</li>
+              <li>Таблицы с подробным подбором баз под НП</li>
+              <li>Файл с артикулами и ценами для первоначальной закупки</li>
+            </ul>
+          </section>
+        </template>
+      </article>
+
+      <article class="tariff-card tariff-card--light" data-tariff-card data-tariff-id="middle">
+        <div class="tariff-chips"><span class="tariff-chip">Офлайн</span><span class="tariff-chip">1&nbsp;день</span><span class="tariff-chip">Для опытных</span></div>
+        <p class="tariff-name" translate="no">Middle</p>
+        <h3 class="tariff-title">Повышение квалификации</h3>
+        <div class="tariff-price">
+          <span class="tariff-price-value" data-tariff-price>{{ "{:,}".format(15000).replace(",", " ") }}&nbsp;₽</span>
+          <a class="tariff-monthly" href="#installment-calc">от&nbsp;{{ "{:,}".format((15000 * 1.086 / 6) | round | int).replace(",", " ") }}&nbsp;₽/мес · оплата частями</a>
+        </div>
+        <ul class="tariff-points">
+            <li><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Только темы, которые вас беспокоят</span></li>
+            <li><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Теория и отработка на модели</span></li>
+            <li><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Персональный разбор вашей техники</span></li>
+        </ul>
+        <div class="tariff-actions">
+          <button type="button" class="tariff-btn tariff-btn--main" data-tariff-open data-tariff-badge="Офлайн" data-tariff-duration="1&nbsp;день" data-tariff-status="Для опытных" data-tariff-title="Middle — Повышение квалификации" data-tariff-cta-text="Добрый день! Хочу записаться на курс повышения квалификации Middle. Подскажите ближайшие даты?">Программа курса</button>
+          <a class="tariff-link" href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс повышения квалификации Middle. Подскажите ближайшие даты?'|urlencode }}" target="_blank" rel="noopener noreferrer">Записаться в&nbsp;<span translate="no">Telegram</span></a>
+        </div>
+        <template data-tariff-detail>
+          <section class="tariff-program-day" data-day="1" data-tab="Кому подойдёт">
+            <div class="tariff-day-head">
+              <span class="tariff-day-num">01</span>
+              <div>
+                <h4>Теория / практика</h4>
+                <p class="tariff-day-meta">1&nbsp;день · 11:00~19:00</p>
+              </div>
+            </div>
+            <p class="tariff-day-lead">Вам подойдёт этот курс, если:</p>
+            <ul>
+              <li>Есть проблемы с укреплением ногтей гелем, гелем-желе или акригелем</li>
+              <li>Не понимаете, как укреплять ногти под корень, и не знаете, как работать с «грызунчиками»</li>
+              <li>Клиенты систематически приходят с отслойками от кутикулы, с торца или по бокам</li>
+              <li>При прокрашивании цветом всё затекает под кутикулу (хромает срез ножницами)</li>
+              <li>При опиле формы «миндаль» сбоку ногти выглядят как клювы</li>
+              <li>Квадратная форма получается слишком объёмной и больше похожа на овал</li>
+              <li>Не понимаете, как сделать те самые чёткие квадраты</li>
+            </ul>
+          </section>
+
+          <section class="tariff-program-day" data-day="2" data-tab="Как пройдёт день">
+            <div class="tariff-day-head">
+              <span class="tariff-day-num">02</span>
+              <div>
+                <h4>Как пройдёт день?</h4>
+              </div>
+            </div>
+            <ul>
+              <li>Обсуждаем теоретическую часть, частично отрабатываем на типсах</li>
+              <li>Переходим к отработке на модели</li>
+              <li>Проходим всё: от снятия материала до покрытия гелем</li>
+              <li>После отработки — ответы на возникшие вопросы и вручение сертификата</li>
+            </ul>
+          </section>
+
+          <section class="tariff-program-day tariff-program-day--bonus" data-tab="Бонусы">
+            <div class="tariff-day-head">
+              <span class="tariff-day-num">+</span>
+              <div>
+                <h4>Бонус</h4>
+              </div>
+            </div>
+            <ul>
+              <li>Схема прорисовки френча</li>
+              <li>Именной сертификат</li>
+              <li>Скидка 10&nbsp;% на продукцию бренда <span translate="no">MILK</span> по промокоду</li>
+              <li>Обратная связь на протяжении 3&nbsp;месяцев</li>
+            </ul>
+          </section>
+        </template>
+      </article>
+    </div>
+
+    <div class="tariff-soon">
+      <span class="tariff-soon-badge"><span class="tariff-soon-dot" aria-hidden="true"></span>Скоро</span>
+      <div class="tariff-soon-body">
+        <p class="tariff-soon-title"><span translate="no">ONLINE</span>-курс</p>
+        <ul class="tariff-soon-features">
+          <li>Видео-уроки</li>
+          <li>Домашние задания с&nbsp;обратной связью</li>
+          <li>Доступ 24/7</li>
+        </ul>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- TESTIMONIALS -->
-<section id="testimonials" class="scroll-anim" style="padding:80px 24px; background:#fdf8f4;">
-  <h2 style="font-family:'Playfair Display', serif; font-size:34px; color:var(--dark); text-align:center; margin-bottom:36px;">Отзывы учеников</h2>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:28px;">
-    <div style="background:#fff; padding:20px; border-radius:10px; box-shadow:0 8px 25px rgba(0,0,0,0.08);">
-      <p style="font-size:14px; color:#6b635e;">“После курса авторского френча я сразу начала зарабатывать первые заказы и получила уверенность в себе!”</p>
-      <strong style="display:block; margin-top:12px; font-family:'Playfair Display', serif;">Алина П.</strong>
+    <aside class="installment-calc" id="installment-calc" data-reveal aria-labelledby="installment-calc-title">
+      <div class="installment-calc-head">
+        <span class="kicker">Оплата частями</span>
+        <h3 id="installment-calc-title">Калькулятор платежей</h3>
+        <p>Выберите курс и срок — посчитаем ежемесячный платёж с учётом надбавки.</p>
+      </div>
+
+      <div class="installment-calc-controls">
+        <div class="installment-field">
+          <span>Стоимость курса</span>
+          <div class="installment-amount-picks" role="group" aria-label="Стоимость курса">
+            <button type="button" class="installment-amount-btn" data-installment-amount="15000" aria-pressed="false">15&nbsp;000&nbsp;₽</button>
+            <button type="button" class="installment-amount-btn is-active" data-installment-amount="40000" aria-pressed="true">40&nbsp;000&nbsp;₽</button>
+          </div>
+        </div>
+
+        <div class="installment-terms" role="radiogroup" aria-label="Срок оплаты частями">
+          <button type="button" class="installment-term is-active" role="radio" data-installment-months="3" data-installment-rate="5" aria-checked="true" tabindex="0">
+            <span class="installment-term-label">3&nbsp;месяца</span>
+            <span class="installment-term-rate">+5&nbsp;%</span>
+          </button>
+          <button type="button" class="installment-term" role="radio" data-installment-months="4" data-installment-rate="6.2" aria-checked="false" tabindex="-1">
+            <span class="installment-term-label">4&nbsp;месяца</span>
+            <span class="installment-term-rate">+6.2&nbsp;%</span>
+          </button>
+          <button type="button" class="installment-term" role="radio" data-installment-months="6" data-installment-rate="8.6" aria-checked="false" tabindex="-1">
+            <span class="installment-term-label">6&nbsp;месяцев</span>
+            <span class="installment-term-rate">+8.6&nbsp;%</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="installment-calc-result">
+        <div class="installment-result-main" aria-live="polite">
+          <span class="installment-result-label">Ежемесячный платёж</span>
+          <strong class="installment-result-monthly" data-installment-monthly>14&nbsp;000&nbsp;₽</strong>
+        </div>
+        <dl class="installment-result-meta" aria-live="polite">
+          <div>
+            <dt>Итого к оплате</dt>
+            <dd data-installment-total>42&nbsp;000&nbsp;₽</dd>
+          </div>
+          <div>
+            <dt>Надбавка</dt>
+            <dd data-installment-fee>2&nbsp;000&nbsp;₽</dd>
+          </div>
+          <div>
+            <dt>Срок</dt>
+            <dd data-installment-term-label>3&nbsp;месяца</dd>
+          </div>
+        </dl>
+        <a
+          class="home-btn primary installment-calc-cta"
+          href="{{ telegram_url }}?text={{ 'Добрый день! Хочу оформить обучение с оплатой частями. Подскажите условия.'|urlencode }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-installment-cta
+        >Оформить в <span translate="no">Telegram</span></a>
+      </div>
+    </aside>
+
+    <dialog class="tdialog" data-tariff-dialog aria-labelledby="tdialog-title">
+      <div class="tdialog-card" data-tdialog-card>
+        <div class="tdialog-grabber" data-tdialog-grab aria-hidden="true"><span></span></div>
+        <button type="button" class="tdialog-close" data-tariff-close aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+
+        <aside class="tdialog-summary">
+          <div class="tdialog-switch" role="group" aria-label="Тариф" data-tdialog-switch></div>
+          <div class="tdialog-chips" data-tdialog-chips></div>
+          <h3 class="tdialog-title" id="tdialog-title" data-tdialog-title></h3>
+          <p class="tdialog-price"><span data-tdialog-price></span> <a class="tdialog-monthly" href="#installment-calc" data-tdialog-monthly></a></p>
+          <ul class="tdialog-points" data-tdialog-points></ul>
+        </aside>
+
+        <div class="tdialog-actions">
+          <a class="tariff-btn tariff-btn--main tdialog-cta" data-tariff-dialog-cta href="#" target="_blank" rel="noopener noreferrer">Записаться в&nbsp;<span translate="no">Telegram</span></a>
+          <div class="tdialog-secondary">
+            <a class="tariff-link" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" translate="no">Instagram</a>
+            {% if show_callback %}<button type="button" class="tariff-link" data-callback-pop-open aria-haspopup="dialog" aria-controls="tariff-callback-pop">Оставить контакты</button>{% endif %}
+          </div>
+        </div>
+
+        <section class="tdialog-program" aria-label="Программа курса">
+          <div class="tdialog-tabs" role="tablist" aria-label="Программа по дням" data-tdialog-tabs></div>
+          <div class="tdialog-panels" data-tdialog-panels></div>
+        </section>
+
+        {% if show_callback %}
+        <div
+          class="callback-pop"
+          id="tariff-callback-pop"
+          data-callback-pop
+          hidden
+        >
+          <button type="button" class="callback-pop-backdrop" data-callback-pop-close aria-label="Закрыть форму"></button>
+          <div class="callback-pop-card" role="dialog" aria-modal="true" aria-labelledby="tariff-callback-pop-title">
+            <button type="button" class="callback-pop-close" data-callback-pop-close aria-label="Закрыть">×</button>
+            <p class="callback-form-title" id="tariff-callback-pop-title">Оставить имя и телефон</p>
+            <form class="callback-form callback-form--compact" data-callback-form data-callback-source="tariff-dialog" novalidate>
+              <input type="hidden" name="course" value="" data-tariff-dialog-course>
+              <div class="callback-hp" aria-hidden="true">
+                <label>Сайт <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+              </div>
+              <div class="callback-form-grid">
+                <label class="callback-field">
+                  <span>Имя</span>
+                  <input type="text" name="name" autocomplete="name" required minlength="2" maxlength="80" placeholder="Как к вам обращаться…">
+                  <p class="callback-field-error" data-field-error hidden></p>
+                </label>
+                <label class="callback-field">
+                  <span>Телефон</span>
+                  <input type="tel" name="phone" autocomplete="tel" required inputmode="tel" placeholder="+7 …">
+                  <p class="callback-field-error" data-field-error hidden></p>
+                </label>
+              </div>
+              <label class="callback-field callback-field--comment">
+                <span>Комментарий</span>
+                <textarea name="comment" rows="2" maxlength="300" placeholder="Например: звонить только после 18:00…"></textarea>
+                <p class="callback-field-error" data-field-error hidden></p>
+              </label>
+              <button type="submit" class="home-btn primary callback-submit">Перезвоните мне</button>
+              <p class="callback-form-status" data-callback-status role="status" aria-live="polite"></p>
+              <p class="callback-form-note">Нажимая кнопку, вы соглашаетесь на <a href="/privacy">обработку персональных данных</a>.</p>
+            </form>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </dialog>
+
+
+  </section>
+
+
+  <section class="home-section works-section" data-reveal>
+    <div class="section-head">
+      <div>
+        <h2>Результаты учениц с базового курса</h2>
+        <p class="works-lead">Кадры с занятий: форма, чистота среза и покрытие, которые девочки отрабатывают на моделях.</p>
+      </div>
     </div>
-    <div style="background:#fff; padding:20px; border-radius:10px; box-shadow:0 8px 25px rgba(0,0,0,0.08);">
-      <p style="font-size:14px; color:#6b635e;">“Преподаватель объясняет доступно, все техники легко повторить дома. Очень довольна курсом!”</p>
-      <strong style="display:block; margin-top:12px; font-family:'Playfair Display', serif;">Мария С.</strong>
+
+    <div class="works-focus-gallery" data-works-focus>
+      <div class="works-stage-col">
+        <div class="works-ig-card works-phone" data-works-phone>
+          <span class="works-phone-island" aria-hidden="true"></span>
+          {# Экран блокировки: виден только с JS-анимациями (html.nh-motion),
+             снимается при прокрутке к секции или по нажатию. #}
+          <div class="works-lock" data-works-lock>
+            <img class="works-lock-wallpaper" src="/static/videos/hero/IMG_0062_poster.jpg" alt="" width="720" height="1290" loading="lazy" decoding="async" />
+            <button type="button" class="works-lock-surface" data-works-unlock aria-label="Разблокировать и смотреть работы учениц">
+              <span class="works-lock-icon" data-lock-icon aria-hidden="true">
+                <svg class="works-lock-shackle" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                  <path d="M7 11V8a5 5 0 0 1 10 0v3" data-lock-shackle />
+                  <rect x="4.5" y="11" width="15" height="10" rx="2.5" fill="currentColor" stroke="none" />
+                </svg>
+              </span>
+              <span class="works-lock-date" data-lock-date></span>
+              <span class="works-lock-time" data-lock-time>9:41</span>
+              <span class="works-lock-note">
+                <span class="works-lock-app" aria-hidden="true">N</span>
+                <span class="works-lock-note-body">
+                  <span class="works-lock-note-head"><b translate="no">Nailis.hub</b><span>сейчас</span></span>
+                  <span data-lock-count>Новые работы учениц с базового курса</span>
+                </span>
+              </span>
+              <span class="works-lock-hint">Прокрутите, чтобы открыть</span>
+              <span class="works-lock-bar" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="works-ig-top" aria-hidden="true"></div>
+          <div class="works-focus-stage">
+            <video
+            class="works-focus-media is-active"
+              data-works-focus-video
+              width="720"
+              height="1290"
+              muted
+              loop
+              playsinline
+              preload="none"
+              poster="/static/videos/hero/IMG_0062_poster.jpg"
+            ></video>
+            <img
+              class="works-focus-media"
+              data-works-focus-image
+              alt="Работа ученицы"
+              width="1080"
+              height="1920"
+              loading="lazy"
+              decoding="async"
+              hidden
+            />
+          </div>
+          <div class="works-ig-bottom" aria-hidden="true"></div>
+        </div>
+
+        <div class="works-controls">
+          <button type="button" class="works-nav" data-works-prev aria-label="Предыдущая работа">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button type="button" class="works-nav" data-works-next aria-label="Следующая работа">
+            <span aria-hidden="true">›</span>
+          </button>
+          <p class="works-counter" data-works-counter aria-live="polite">1&nbsp;из&nbsp;12</p>
+          <button type="button" class="works-focus-pause" data-works-pause aria-pressed="false">Пауза</button>
+        </div>
+      </div>
+
+      <ul class="works-index" data-works-thumbs>
+        <li>
+          <button
+            type="button"
+            class="works-thumb is-active"
+            aria-pressed="true"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/videos/hero/IMG_0062_hero.mp4"
+            data-poster="/static/videos/hero/IMG_0062_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/videos/hero/IMG_0062_poster.jpg" alt="" width="720" height="1290" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Акмарал</span>
+              <span class="works-thumb-meta">Длинный квадрат, нюдовое покрытие</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/videos/hero/IMG_0110_hero.mp4"
+            data-poster="/static/videos/hero/IMG_0110_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/videos/hero/IMG_0110_poster.jpg" alt="" width="720" height="1290" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Акмарал</span>
+              <span class="works-thumb-meta">Короткий овал, чистая кутикула</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/videos/hero/IMG_0026_hero.mp4"
+            data-poster="/static/videos/hero/IMG_0026_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/videos/hero/IMG_0026_poster.jpg" alt="" width="720" height="1290" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Акмарал</span>
+              <span class="works-thumb-meta">Короткий овал</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/videos/hero/IMG_0889_hero.mp4"
+            data-poster="/static/videos/hero/IMG_0889_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/videos/hero/IMG_0889_poster.jpg" alt="" width="720" height="1290" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Мария</span>
+              <span class="works-thumb-meta">Квадрат с длиной, укрепление гелем</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/images/result_students/IMG_6178.mp4"
+            data-poster="/static/images/result_students/IMG_6178_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/IMG_6178_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Маргарита</span>
+              <span class="works-thumb-meta">Длинный миндаль, плотный глянец</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/images/result_students/IMG_7222.mp4"
+            data-poster="/static/images/result_students/IMG_7222_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/IMG_7222_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Анастасия</span>
+              <span class="works-thumb-meta">Длинный миндаль, лавандовый нюд</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/images/result_students/IMG_4168.mp4"
+            data-poster="/static/images/result_students/IMG_4168_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/IMG_4168_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Анна</span>
+              <span class="works-thumb-meta">Средняя длина, мягкий квадрат</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="video"
+            data-src="/static/images/result_students/IMG_4240.mp4"
+            data-poster="/static/images/result_students/IMG_4240_poster.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/IMG_4240_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Анна</span>
+              <span class="works-thumb-meta">Острый квадрат, гель с блестками</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="image"
+            data-src="/static/images/result_students/IMG_5924.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/IMG_5924_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Маргарита</span>
+              <span class="works-thumb-meta">Мягкий квадрат</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="image"
+            data-src="/static/images/result_students/IMG_5950.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/IMG_5950_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Маргарита</span>
+              <span class="works-thumb-meta">Острый квадрат, гель с шиммером</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="image"
+            data-src="/static/images/result_students/IMG_7187.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/IMG_7187_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Анастасия</span>
+              <span class="works-thumb-meta">Средняя длина, нежный нюд</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="works-thumb"
+            aria-pressed="false"
+            data-works-thumb
+            data-type="image"
+            data-src="/static/images/result_students/nastya.jpg"
+          >
+            <span class="works-thumb-tip">
+              <img src="/static/images/result_students/nastya_thumb.jpg" alt="" width="220" height="391" loading="lazy" decoding="async" />
+            </span>
+            <span class="works-thumb-copy">
+              <span class="works-thumb-name">Анастасия</span>
+              <span class="works-thumb-meta">Короткий овал</span>
+            </span>
+          </button>
+        </li>
+      </ul>
     </div>
-  </div>
-</section>
+  </section>
+
+  {% if testimonials %}
+  {% macro msgr_avatar(c, i, cls="") -%}
+    {% if c.avatar %}<img class="msgr-avatar {{ cls }}" src="{{ c.avatar }}" alt="" width="44" height="44" loading="lazy" decoding="async" />
+    {%- else %}<span class="msgr-avatar msgr-avatar--{{ i % 4 }} {{ cls }}" aria-hidden="true">{{ c.name[:1] }}</span>{% endif %}
+  {%- endmacro %}
+  <section class="home-section testimonials-section testimonials-chat" data-reveal>
+    <div class="section-head">
+      <div>
+        <span class="kicker">Отзывы учениц</span>
+        <h2>Что говорят те, кто уже прошёл обучение</h2>
+      </div>
+      <p>Настоящие сообщения учениц после курса. Нажмите «Оригинал», чтобы посмотреть скриншот.</p>
+    </div>
+
+    <div class="msgr" data-msgr>
+      <div class="msgr-side">
+        <div class="msgr-side-head">
+          <span translate="no">Nailis.hub</span>
+          {% if testimonials_demo %}<span class="msgr-demo" title="Демо-переписки видны только в разработке. Замените их в content/testimonials.json">демо</span>{% endif %}
+        </div>
+        <div class="msgr-list" role="tablist" aria-label="Переписки с ученицами" data-msgr-list>
+          {% for c in testimonials %}
+          <button type="button" class="msgr-item" role="tab" id="msgr-tab-{{ loop.index0 }}" aria-controls="msgr-chat-{{ loop.index0 }}" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ 0 if loop.first else -1 }}" data-msgr-tab>
+            {{ msgr_avatar(c, loop.index0) }}
+            <span class="msgr-item-copy">
+              <span class="msgr-item-top">
+                <b>{{ c.name }}</b>
+                {% if c.time %}<time>{{ c.time }}</time>{% endif %}
+              </span>
+              <span class="msgr-item-preview">{% if c.preview_from_teacher %}<span>Олеся:</span> {% endif %}{{ c.preview }}</span>
+            </span>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="msgr-panes">
+        {% for c in testimonials %}
+        <section class="msgr-chat" role="tabpanel" id="msgr-chat-{{ loop.index0 }}" aria-labelledby="msgr-tab-{{ loop.index0 }}" data-msgr-chat>
+          <header class="msgr-chat-head">
+            {{ msgr_avatar(c, loop.index0, "msgr-avatar--sm") }}
+            <div>
+              <b>{{ c.name }}</b>
+              <span>ученица{% if c.course %} · <span translate="no">{{ c.course }}</span>{% endif %}</span>
+            </div>
+            {% if c.original %}
+            <button type="button" class="msgr-original" data-msgr-zoom="{{ c.original }}" data-msgr-zoom-alt="Скриншот отзыва: {{ c.name }}">
+              <img src="{{ c.original_thumb }}" alt="" width="40" height="40" loading="lazy" decoding="async" />
+              <span>Оригинал</span>
+            </button>
+            {% endif %}
+          </header>
+          <ol class="msgr-feed" data-lenis-prevent>
+            {% for m in c.messages %}
+            <li class="msgr-row msgr-row--{{ 'out' if m.from == 'teacher' else 'in' }}" data-msgr-msg>
+              <div class="msgr-bubble{% if m.image and not m.text %} msgr-bubble--photo{% endif %}">
+                <span class="msgr-typing" aria-hidden="true"><i></i><i></i><i></i></span>
+                {% if m.image %}
+                <button type="button" class="msgr-photo" data-msgr-zoom="{{ m.image }}" data-msgr-zoom-alt="{{ m.alt }}">
+                  <img src="{{ m.image }}" alt="{{ m.alt }}" loading="lazy" decoding="async" />
+                </button>
+                {% endif %}
+                {% if m.text %}<p class="msgr-text">{{ m.text }}</p>{% endif %}
+                {% if m.time or m.edited or m.from == 'teacher' %}
+                <span class="msgr-time">{% if m.from == 'teacher' %}Олеся · {% endif %}{% if m.edited %}изменено {% endif %}{{ m.time }}{% if m.from == 'teacher' %} <span class="msgr-ticks" aria-hidden="true">✓✓</span>{% endif %}</span>
+                {% endif %}
+              </div>
+            </li>
+            {% endfor %}
+          </ol>
+          <footer class="msgr-compose">
+            <span class="msgr-compose-hint">Хотите так&nbsp;же?</span>
+            <a class="msgr-compose-btn" href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс'|urlencode }}" target="_blank" rel="noopener noreferrer">Написать Олесе в&nbsp;<span translate="no">Telegram</span></a>
+          </footer>
+        </section>
+        {% endfor %}
+      </div>
+    </div>
+
+    <dialog class="msgr-lightbox" data-msgr-lightbox aria-label="Скриншот отзыва">
+      <button type="button" class="msgr-lightbox-close" data-msgr-lightbox-close aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <img alt="" data-msgr-lightbox-img />
+    </dialog>
+  </section>
+  {% endif %}
+  <section class="home-section faq-section" data-reveal id="faq">
+    <div class="section-head">
+      <div>
+        <span class="kicker" translate="no">FAQ</span>
+        <h2>Частые вопросы</h2>
+      </div>
+    </div>
+
+    <div class="faq-layout">
+    <div class="faq-visual" aria-hidden="true">
+      <div class="faq-visual-frame">
+        <img src="/static/images/my_work3.jpg" alt="" width="720" height="1280" loading="lazy" decoding="async" data-faq-visual />
+      </div>
+    </div>
+    <div class="faq-list" data-faq-list>
+      <details class="faq-item" data-faq="experience">
+        <summary>Нужен ли опыт, чтобы начать обучение?</summary>
+        <div class="faq-answer">
+          <p>Нет. Есть форматы для новичков с нуля и офлайн-повышение для тех, кто уже работает. На старте разберём ваш уровень и подберём программу.</p>
+        </div>
+      </details>
+      <details class="faq-item" data-faq="format">
+        <summary>Чем отличается онлайн от офлайн?</summary>
+        <div class="faq-answer">
+          <p>Онлайн — пошаговая программа в записи в своём темпе. Офлайн — живая практика один на один с разбором техники и отработками под контролем.</p>
+        </div>
+      </details>
+      <details class="faq-item" data-faq="support">
+        <summary>Есть ли поддержка после курса?</summary>
+        <div class="faq-answer">
+          <p>Да. Можно присылать работы, задавать вопросы и закреплять навык. В обучении заложена обратная связь, чтобы вы не остались один на один с ошибками.</p>
+        </div>
+      </details>
+      <details class="faq-item" data-faq="duration">
+        <summary>Сколько длится обучение и когда старт?</summary>
+        <div class="faq-answer">
+          <p>Срок зависит от формата: онлайн можно проходить в своём ритме, офлайн согласуем даты индивидуально. Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — подберём ближайший старт.</p>
+        </div>
+      </details>
+      <details class="faq-item" data-faq="result">
+        <summary>Что я получу на выходе?</summary>
+        <div class="faq-answer">
+          <p>Поставленную технику, понимание чистоты и покрытия, работы для портфолио и понятный сценарий, как выходить к клиентам и расти в чеке.</p>
+        </div>
+      </details>
+      <details class="faq-item" data-faq="signup">
+        <summary>Как записаться?</summary>
+        <div class="faq-answer">
+          <p>Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — расскажите, какой формат интересен (офлайн / базовый / PRO). Или оставьте имя и телефон в форме ниже, и мы перезвоним.</p>
+          <p class="faq-contact-links">
+            <a href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс'|urlencode }}" class="faq-link" target="_blank" rel="noopener noreferrer" translate="no">Telegram</a>
+            <a href="{{ instagram_url }}" class="faq-link" target="_blank" rel="noopener noreferrer" translate="no">Instagram</a>
+          </p>
+        </div>
+      </details>
+    </div>
+    </div>
+  </section>
 
 
-<!-- CTA -->
-<section id="cta" class="scroll-anim" style="padding:80px 24px; background:var(--accent); color:#fff; text-align:center; border-radius:12px; margin:80px 24px;">
-  <h2 style="font-family:'Playfair Display', serif; font-size:34px; margin-bottom:16px;">Начни обучение прямо сейчас!</h2>
-  <p style="font-size:16px; margin-bottom:24px;">Присоединяйся к нашим онлайн-курсам и развивай свои навыки с профессионалами Nailis Hub.</p>
-  <a href="/auth/register" style="display:inline-block; padding:14px 28px; background:#fff; color:var(--accent); font-weight:700; border-radius:8px; text-decoration:none; transition:transform var(--transition);">Записаться</a>
-</section>
+  <section class="final-cta" data-reveal id="callback">
+    <div class="final-cta-media" aria-hidden="true" data-cta-window>
+      <div class="cta-scene" data-cta-photo>
+        <div class="cta-drift">
+          <img class="cta-scene-bg" src="/static/images/cta-cat-bg.jpg" alt="" width="2560" height="1440" loading="lazy" decoding="async" />
+          <img class="cta-scene-cat" src="/static/images/cta-cat-layer.webp" alt="" width="2560" height="1440" loading="lazy" decoding="async" />
+        </div>
+        <div class="cta-motes"><span class="cta-mote" style="--x:12%;--y:78%;--d:0s;--t:9s"></span><span class="cta-mote" style="--x:24%;--y:70%;--d:2.5s;--t:11s"></span><span class="cta-mote" style="--x:37%;--y:84%;--d:5s;--t:8s"></span><span class="cta-mote" style="--x:48%;--y:66%;--d:1.2s;--t:12s"></span><span class="cta-mote" style="--x:58%;--y:80%;--d:3.6s;--t:10s"></span><span class="cta-mote" style="--x:66%;--y:72%;--d:6.2s;--t:9s"></span><span class="cta-mote" style="--x:86%;--y:76%;--d:4.4s;--t:11s"></span><span class="cta-mote" style="--x:93%;--y:64%;--d:7.5s;--t:13s"></span></div>
+      </div>
+      <div class="final-cta-veil"></div>
+    </div>
+    <div class="final-cta-copy">
+      <p class="hero-brand" translate="no">Nailis.hub</p>
+      <h2 data-split-chars>Готовы начать?</h2>
+      <p>{% if show_callback %}Напишите в мессенджер или оставьте контакты{% else %}Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span>{% endif %} — подберём формат и дату старта.</p>
+      <div class="final-cta-actions">
+        <a href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс'|urlencode }}" class="home-btn primary" target="_blank" rel="noopener noreferrer" translate="no">
+          Telegram
+        </a>
+        <a href="{{ instagram_url }}" class="home-btn secondary" target="_blank" rel="noopener noreferrer" translate="no">
+          Instagram
+        </a>
+      </div>
 
+      {% if show_callback %}
+      <form class="callback-form callback-form--on-dark" data-callback-form data-callback-source="homepage" novalidate>
+        <p class="callback-form-title">Или оставьте имя и телефон</p>
+        <div class="callback-hp" aria-hidden="true">
+          <label>Сайт <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <div class="callback-form-grid">
+          <label class="callback-field">
+            <span>Имя</span>
+            <input type="text" name="name" autocomplete="name" required minlength="2" maxlength="80" placeholder="Как к вам обращаться…">
+            <p class="callback-field-error" data-field-error hidden></p>
+          </label>
+          <label class="callback-field">
+            <span>Телефон</span>
+            <input type="tel" name="phone" autocomplete="tel" required inputmode="tel" placeholder="+7 …">
+            <p class="callback-field-error" data-field-error hidden></p>
+          </label>
+        </div>
+        <label class="callback-field callback-field--comment">
+          <span>Комментарий</span>
+          <textarea name="comment" rows="2" maxlength="300" placeholder="Например: звонить только после 18:00…"></textarea>
+          <p class="callback-field-error" data-field-error hidden></p>
+        </label>
+        <button type="submit" class="home-btn primary callback-submit">Перезвоните мне</button>
+        <p class="callback-form-status" data-callback-status role="status" aria-live="polite"></p>
+        <p class="callback-form-note">Нажимая кнопку, вы соглашаетесь на <a href="/privacy">обработку персональных данных</a>.</p>
+      </form>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}
 
-</main>
-
-<footer>&copy; 2025 Nailis Hub. Все права защищены.</footer>
-
-<script>
-// Intersection Observer для анимации при скролле
-const animItems = document.querySelectorAll('.scroll-anim');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if(entry.isIntersecting) entry.target.classList.add('show');
-  });
-}, { threshold: 0.2 });
-
-animItems.forEach(el => observer.observe(el));
-</script>
-
-</body>
-</html>
+{% block extra_js %}
+  <script src="/static/js/index-page.js?v={{ asset_v|default('dev', true) }}" defer></script>
+  <script src="/static/vendor/gsap.min.js" defer></script>
+  <script src="/static/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="/static/vendor/lenis.min.js" defer></script>
+  <script src="/static/js/home-motion.js?v={{ asset_v|default('dev', true) }}" defer></script>
+  {% if dev_live_reload %}
+  <script>
+    (function () {
+      var last = {{ asset_v|default('0', true)|tojson }};
+      async function tick() {
+        try {
+          var res = await fetch("/__dev__/reload-version", { cache: "no-store" });
+          if (!res.ok) return;
+          var data = await res.json();
+          if (data && data.v && String(data.v) !== String(last)) {
+            window.location.reload();
+          }
+        } catch (err) {}
+      }
+      setInterval(tick, 800);
+    })();
+  </script>
+  {% endif %}
+{% endblock %}

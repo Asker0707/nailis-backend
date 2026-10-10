@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Оплата: {{ course.title }} | Nailis.hub{% endblock %}
+
+{% block extra_css %}
+  <link href="/static/css/pages/course-pay.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="pay-page">
+  <section class="pay-card">
+    <p class="pay-kicker">Доступ к курсу</p>
+    <h1 class="pay-title">{{ course.title }}</h1>
+
+    {% if course.price is not none %}
+    <div class="pay-price-block">
+      <span class="pay-price-label">Стоимость</span>
+      <strong class="pay-price-value">{{ course.price|rub }}</strong>
+      <span class="pay-price-note">разовый доступ к материалам курса</span>
+    </div>
+    {% endif %}
+
+    <p class="pay-lead">
+      Материалы курса открываются после оплаты. Напишите Олесе в Telegram — она подтвердит оплату
+      и откроет доступ в кабинете вручную.
+    </p>
+
+    <div class="pay-actions">
+      <a
+        class="pay-btn primary"
+        href="{{ telegram_url }}"
+        target="_blank"
+        rel="noopener"
+      >
+        <i class="bi bi-telegram" aria-hidden="true"></i>
+        {% if course.price is not none %}Оплатить {{ course.price|rub }}{% else %}Написать в Telegram / Купить{% endif %}
+      </a>
+      <a class="pay-btn secondary" href="/courses/{{ course.id }}">К списку уроков</a>
+      <a class="pay-btn ghost" href="/courses">Все курсы</a>
+    </div>
+
+    <p class="pay-note">
+      После оплаты доступ появится, когда администратор отметит его в разделе «Ученики».
+      Бесплатные курсы открыты сразу после регистрации.
+    </p>
+  </section>
+</div>
+{% endblock %}

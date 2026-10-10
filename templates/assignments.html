@@ -1,30 +1,45 @@
 {% extends "base.html" %}
-
-{% block title %}Домашние задания{% endblock %}
+{% block title %}Домашние задания | Nailis.hub{% endblock %}
 
 {% block content %}
-<h2>Мои домашние задания</h2>
+<div class="nh-page">
+  <header class="nh-surface admin-hero reveal-up">
+    <span class="nh-kicker">Практика</span>
+    <h1 class="nh-title" style="font-size: clamp(1.8rem, 3.5vw, 2.6rem); margin-top: 0.75rem;">Мои домашние задания</h1>
+    <p class="nh-subtitle" style="margin-top: 0.45rem;">Загружайте работы, следите за статусом проверки и читайте комментарии преподавателя.</p>
+  </header>
 
-<div class="list-group mt-3">
-  {% for assignment in assignments %}
-  <div class="list-group-item">
-    <h5>{{ assignment.title }}</h5>
-    <p>{{ assignment.description }}</p>
-    {% if assignment.submission_path %}
-      <p><strong>Ваш файл:</strong> <a href="/{{ assignment.submission_path }}" target="_blank">Смотреть</a></p>
-      <p><strong>Статус проверки:</strong> {{ assignment.status }}</p>
-      {% if assignment.feedback %}
-        <p><strong>Комментарий:</strong> {{ assignment.feedback }}</p>
-      {% endif %}
-    {% else %}
-      <form action="/assignments/{{ assignment.id }}/submit" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-          <input type="file" name="file" class="form-control" required>
+  <div class="assignments-list">
+    {% if assignments %}
+      {% for assignment in assignments %}
+      <article class="nh-surface assignment-card reveal-up" style="--delay: {{ 40 + loop.index0 * 35 }}ms;">
+        <h3>{{ assignment.title }}</h3>
+        <p>{{ assignment.description }}</p>
+
+        {% if assignment.submission_path %}
+        <div class="assignment-meta">
+          <span><strong>Файл:</strong> <a href="/{{ assignment.submission_path }}" target="_blank" rel="noopener">Смотреть</a></span>
+          <span><strong>Статус:</strong> {{ assignment.status }}</span>
         </div>
-        <button type="submit" class="btn btn-primary">Отправить</button>
-      </form>
+        {% if assignment.feedback %}
+        <p><strong>Комментарий:</strong> {{ assignment.feedback }}</p>
+        {% endif %}
+        {% else %}
+        <form action="/assignments/{{ assignment.id }}/submit" method="post" enctype="multipart/form-data" class="admin-form" style="padding:0;">
+          <div>
+            <label class="form-label" for="file-{{ assignment.id }}">Файл работы</label>
+            <input id="file-{{ assignment.id }}" type="file" name="file" class="form-control" required>
+          </div>
+          <button type="submit" class="nh-btn primary">Отправить</button>
+        </form>
+        {% endif %}
+      </article>
+      {% endfor %}
+    {% else %}
+      <div class="nh-surface admin-empty reveal-up">
+        Пока нет домашних заданий. Они появятся здесь после назначения в курсе.
+      </div>
     {% endif %}
   </div>
-  {% endfor %}
 </div>
 {% endblock %}

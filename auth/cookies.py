@@ -18,6 +18,7 @@ from fastapi.responses import RedirectResponse
 from core.config import settings
 
 logger = logging.getLogger(__name__)
+FLASH_ERROR_EXPIRE_SECONDS = 300
 
 
 def set_auth_cookie(response: RedirectResponse, token: str) -> RedirectResponse:
@@ -40,6 +41,7 @@ def set_auth_cookie(response: RedirectResponse, token: str) -> RedirectResponse:
             expires=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
             secure=settings.COOKIE_SECURE,
             samesite=settings.SAMESITE,
+            path="/",
         )
         logger.debug("Установлен cookie access_token для аутентификации.")
     except Exception as e:
@@ -58,7 +60,12 @@ def clear_auth_cookie(response: RedirectResponse) -> RedirectResponse:
         RedirectResponse: Обновленный ответ с удаленной cookie.
     """
     try:
-        response.delete_cookie(key="access_token", path="/")
+        response.delete_cookie(
+            key="access_token",
+            path="/",
+            secure=settings.COOKIE_SECURE,
+            samesite=settings.SAMESITE,
+        )
         logger.debug("Удален cookie access_token.")
     except Exception as e:
         logger.error("Ошибка при удалении cookie access_token: %s", e)
@@ -68,27 +75,40 @@ def clear_auth_cookie(response: RedirectResponse) -> RedirectResponse:
 def create_flash_error_redirect(url: str, message: str) -> RedirectResponse:
     """
     Создает RedirectResponse с flash-сообщением об ошибке в cookie.
-
-    Args:
-        url (str): URL для редиректа.
-        message (str): Текст flash-сообщения.
-
-    Returns:
-        RedirectResponse: Ответ с редиректом и установленной flash cookie.
     """
     try:
         response = RedirectResponse(url=url, status_code=303)
         response.set_cookie(
             key="flash_error",
             value=quote(message),
-            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-            httponly=True,
+            max_age=FLASH_ERROR_EXPIRE_SECONDS,
+            httponly=False,
             secure=settings.COOKIE_SECURE,
             samesite=settings.SAMESITE,
+            path="/",
         )
         logger.debug("Установлено flash-сообщение в cookie: %s", message)
     except Exception as e:
         logger.error("Ошибка при установке flash-сообщения в cookie: %s", e)
+        response = RedirectResponse(url=url, status_code=303)
+    return response
+
+
+def create_flash_success_redirect(url: str, message: str) -> RedirectResponse:
+    """Редирект с flash-сообщением об успехе (читается toast.js)."""
+    try:
+        response = RedirectResponse(url=url, status_code=303)
+        response.set_cookie(
+            key="flash_success",
+            value=quote(message),
+            max_age=FLASH_ERROR_EXPIRE_SECONDS,
+            httponly=False,
+            secure=settings.COOKIE_SECURE,
+            samesite=settings.SAMESITE,
+            path="/",
+        )
+    except Exception as e:
+        logger.error("Ошибка при установке flash_success: %s", e)
         response = RedirectResponse(url=url, status_code=303)
     return response
 
@@ -113,6 +133,7 @@ def set_refresh_cookie(response: RedirectResponse, token: str) -> RedirectRespon
             expires=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
             secure=settings.COOKIE_SECURE,
             samesite=settings.SAMESITE,
+            path="/",
         )
         logger.debug("Установлен refresh_token в cookie на %s дней.",
                      settings.REFRESH_TOKEN_EXPIRE_DAYS)
@@ -132,7 +153,12 @@ def clear_refresh_cookie(response: RedirectResponse) -> RedirectResponse:
         RedirectResponse: Обновленный ответ с удаленной refresh cookie.
     """
     try:
-        response.delete_cookie(key="refresh_token", path="/")
+        response.delete_cookie(
+            key="refresh_token",
+            path="/",
+            secure=settings.COOKIE_SECURE,
+            samesite=settings.SAMESITE,
+        )
         logger.debug("Удален cookie refresh_token.")
     except Exception as e:
         logger.error("Ошибка при удалении cookie refresh_token: %s", e)

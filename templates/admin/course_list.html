@@ -1,29 +1,103 @@
 {% extends "base.html" %}
-{% block title %}Админка: Курсы{% endblock %}
+{% block title %}Админка: Курсы | Nailis.hub{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2>Список курсов</h2>
-  <a href="/admin/courses/new" class="btn btn-success mb-3">+ Создать курс</a>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Название</th>
-        <th>Действия</th>
-      </tr>
-    </thead>
-    <tbody>
+<div class="nh-page admin-page">
+  <header class="nh-surface admin-hero reveal-up">
+    <span class="nh-kicker">Админка</span>
+    <h1>Курсы</h1>
+    <p>Создавайте программы, редактируйте описания и переходите к урокам.</p>
+  </header>
+
+  <section class="nh-surface admin-panel reveal-up" style="--delay: 40ms;">
+    <div class="admin-toolbar mb-3">
+      <h2>Список курсов</h2>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="/admin/students" class="nh-btn secondary">Ученики и доступы</a>
+        <a href="/admin/courses/new" class="nh-btn primary">+ Создать курс</a>
+      </div>
+    </div>
+
+    {% if courses %}
+    <div class="admin-cards">
       {% for course in courses %}
-      <tr>
-        <td>{{ course.id }}</td>
-        <td>{{ course.title }}</td>
-        <td>
-          <a href="/admin/courses/{{ course.id }}/edit" class="btn btn-primary btn-sm">Редактировать</a>
-          <a href="/admin/courses/{{ course.id }}/delete" class="btn btn-danger btn-sm" onclick="return confirm('Удалить курс?');">Удалить</a>
-        </td>
-      </tr>
+      <article class="admin-course-card">
+        <div class="admin-course-cover">
+          <img src="{{ course.cover_path|course_cover }}" alt="" loading="lazy" decoding="async" />
+        </div>
+        <div class="admin-course-body">
+          <h3>{{ course.title }}</h3>
+          <p>{{ (course.description or 'Без описания')|truncate(120, True, '...') }}</p>
+          <p class="mb-2">
+            {% if course.is_free %}
+            <span class="badge text-bg-success">Бесплатный</span>
+            {% else %}
+            <span class="badge text-bg-secondary">Платный</span>
+            {% if course.price is not none %}
+            <span class="badge text-bg-dark">{{ course.price|rub }}</span>
+            {% endif %}
+            {% endif %}
+          </p>
+          <div class="admin-table-actions">
+            <a href="/admin/courses/{{ course.id }}/lessons" class="nh-btn secondary">Уроки</a>
+            <a href="/admin/courses/{{ course.id }}/edit" class="nh-btn primary">Редактировать</a>
+            <form
+              action="/admin/courses/{{ course.id }}/delete"
+              method="post"
+              class="d-inline"
+              data-confirm-title="Удалить курс?"
+              data-confirm-message="Курс, уроки и связанные данные будут удалены без возможности восстановления."
+              data-confirm-ok="Удалить"
+              data-confirm-cancel="Отмена"
+            >
+              <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+            </form>
+          </div>
+        </div>
+      </article>
       {% endfor %}
-    </tbody>
-  </table>
+    </div>
+
+    <div class="table-responsive admin-table-wrap">
+      <table class="table admin-table align-middle">
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in courses %}
+          <tr>
+            <td><strong>{{ course.title }}</strong></td>
+            <td>
+              <div class="admin-table-actions">
+                <a href="/admin/courses/{{ course.id }}/lessons" class="btn btn-secondary btn-sm">Уроки</a>
+                <a href="/admin/courses/{{ course.id }}/edit" class="btn btn-primary btn-sm">Изменить</a>
+                <form
+                  action="/admin/courses/{{ course.id }}/delete"
+                  method="post"
+                  class="d-inline"
+                  data-confirm-title="Удалить курс?"
+                  data-confirm-message="Курс, уроки и связанные данные будут удалены без возможности восстановления."
+                  data-confirm-ok="Удалить"
+                  data-confirm-cancel="Отмена"
+                >
+                  <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="admin-empty">
+      <p class="mb-3">Курсов пока нет.</p>
+      <a href="/admin/courses/new" class="nh-btn primary">Создать курс</a>
+    </div>
+    {% endif %}
+  </section>
 </div>
 {% endblock %}

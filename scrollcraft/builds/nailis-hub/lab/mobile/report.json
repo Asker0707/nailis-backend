@@ -1,0 +1,388 @@
+{
+  "width": 390,
+  "height": 844,
+  "reduced": false,
+  "logs": [],
+  "report": {
+    "acts": [
+      {
+        "id": "title",
+        "act": "flow",
+        "top": 0,
+        "height": 306
+      },
+      {
+        "id": "check",
+        "act": "flow",
+        "top": 306.21875,
+        "height": 844
+      },
+      {
+        "id": "mentor",
+        "act": "flow",
+        "top": 1150.21875,
+        "height": 1330
+      },
+      {
+        "id": "outcome",
+        "act": "flow",
+        "top": 2480.4375,
+        "height": 875
+      },
+      {
+        "id": "formats",
+        "act": "pan",
+        "top": 3355.359375,
+        "height": 2363
+      },
+      {
+        "id": "hush",
+        "act": "flow",
+        "top": 5718.546875,
+        "height": 540
+      },
+      {
+        "id": "works",
+        "act": "scrub",
+        "top": 6258.703125,
+        "height": 3376
+      },
+      {
+        "id": "zapis",
+        "act": "flow",
+        "top": 9634.703125,
+        "height": 1359
+      }
+    ],
+    "overflow": 0,
+    "panOver": 1400,
+    "railWidth": 1790,
+    "title": "Индивидуальное\nобучение маникюру",
+    "h1Opacity": "1"
+  },
+  "shots": [
+    {
+      "file": "00-title-015.png",
+      "act": "title",
+      "y": 0,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 10.74%)",
+      "overflowX": 0
+    },
+    {
+      "file": "01-title-055.png",
+      "act": "title",
+      "y": 0,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 10.74%)",
+      "overflowX": 0
+    },
+    {
+      "file": "02-title-085.png",
+      "act": "title",
+      "y": 0,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 10.74%)",
+      "overflowX": 0
+    },
+    {
+      "file": "03-check-015.png",
+      "act": "check",
+      "y": 0,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 10.74%)",
+      "overflowX": 0
+    },
+    {
+      "file": "04-check-055.png",
+      "act": "check",
+      "y": 0,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 10.74%)",
+      "overflowX": 0
+    },
+    {
+      "file": "05-check-085.png",
+      "act": "check",
+      "y": 175,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "06-mentor-015.png",
+      "act": "mentor",
+      "y": 417,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "07-mentor-055.png",
+      "act": "mentor",
+      "y": 734,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "08-mentor-085.png",
+      "act": "mentor",
+      "y": 1007,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "09-outcome-015.png",
+      "act": "outcome",
+      "y": 1552,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "10-outcome-055.png",
+      "act": "outcome",
+      "y": 2056,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "11-outcome-085.png",
+      "act": "outcome",
+      "y": 2338,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "12-formats-005.png",
+      "act": "formats",
+      "y": 2986,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "13-formats-025.png",
+      "act": "formats",
+      "y": 3666,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "0",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "14-formats-05.png",
+      "act": "formats",
+      "y": 4050,
+      "h1": "1",
+      "videoTime": 0.05,
+      "videoOpacity": "0.922086",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "15-formats-075.png",
+      "act": "formats",
+      "y": 4430,
+      "h1": "1",
+      "videoTime": 0.05,
+      "videoOpacity": "1",
+      "kineticOpacity": "0",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "16-formats-095.png",
+      "act": "formats",
+      "y": 4760,
+      "h1": "1",
+      "videoTime": 0.05,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "17-hush-015.png",
+      "act": "hush",
+      "y": 4988,
+      "h1": "1",
+      "videoTime": 0.05,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "18-hush-055.png",
+      "act": "hush",
+      "y": 5302,
+      "h1": "1",
+      "videoTime": null,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "19-hush-085.png",
+      "act": "hush",
+      "y": 5576,
+      "h1": "1",
+      "videoTime": 0.21,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "20-works-005.png",
+      "act": "works",
+      "y": 6383,
+      "h1": "1",
+      "videoTime": 1.84,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "21-works-025.png",
+      "act": "works",
+      "y": 6892,
+      "h1": "1",
+      "videoTime": 2.61,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "22-works-05.png",
+      "act": "works",
+      "y": 7525,
+      "h1": "1",
+      "videoTime": 3.31,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "23-works-075.png",
+      "act": "works",
+      "y": 8158,
+      "h1": "1",
+      "videoTime": 4.01,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "24-works-095.png",
+      "act": "works",
+      "y": 8664,
+      "h1": "1",
+      "videoTime": 4.72,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "25-zapis-015.png",
+      "act": "zapis",
+      "y": 8901,
+      "h1": "1",
+      "videoTime": 4.97,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "26-zapis-055.png",
+      "act": "zapis",
+      "y": 9218,
+      "h1": "1",
+      "videoTime": 5.46,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    },
+    {
+      "file": "27-zapis-085.png",
+      "act": "zapis",
+      "y": 9492,
+      "h1": "1",
+      "videoTime": 6.1,
+      "videoOpacity": "1",
+      "kineticOpacity": "1",
+      "revealClip": "inset(0px 0px 0%)",
+      "overflowX": 0
+    }
+  ],
+  "nameBefore": "ваше имя",
+  "nameAfter": "Ася",
+  "monthly": "8 145 ₽",
+  "dialogOpen": 1,
+  "dialogAfter": 0,
+  "focusOrder": [
+    "К содержанию",
+    "Nailis.hub",
+    "Карта",
+    "Записаться",
+    "Записаться",
+    "BUTTON",
+    "BUTTON",
+    "BUTTON"
+  ]
+}

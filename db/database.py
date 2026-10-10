@@ -52,7 +52,12 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         AsyncSession: Асинхронная сессия SQLAlchemy
 
     Примечание:
-        Автоматически закрывает сессию после завершения работы.
+        При необработанном исключении выполняется rollback.
+        Сессия закрывается автоматически.
     """
     async with async_session_factory() as session:
-        yield session
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise

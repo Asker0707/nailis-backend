@@ -1,26 +1,73 @@
 {% extends "base.html" %}
-{% block title %}Уроки — {{ course.title }}{% endblock %}
+{% block title %}Уроки — {{ course.title }} | Nailis.hub{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2>Уроки курса «{{ course.title }}»</h2>
-  <a href="/admin/courses/{{ course.id }}/lessons/new" class="btn btn-success mb-3">+ Новый урок</a>
-  <table class="table table-hover">
-    <thead>
-      <tr><th>Название</th><th>Видео</th><th>Действия</th></tr>
-    </thead>
-    <tbody>
-    {% for lesson in lessons %}
-      <tr>
-        <td>{{ lesson.title }}</td>
-        <td>{% if lesson.video_path %}📹{% else %}—{% endif %}</td>
-        <td>
-          <a href="/admin/lessons/{{ lesson.id }}/edit" class="btn btn-sm btn-primary">✎</a>
-          <a href="/admin/lessons/{{ lesson.id }}/delete" class="btn btn-sm btn-danger"
-             onclick="return confirm('Удалить урок?')">🗑</a>
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<div class="nh-page admin-page">
+  <header class="nh-surface admin-hero reveal-up">
+    <span class="nh-kicker">Админка · Уроки</span>
+    <h1>{{ course.title }}</h1>
+    <p>Управляйте порядком материалов курса: добавляйте, редактируйте и удаляйте уроки.</p>
+  </header>
+
+  <section class="nh-surface admin-panel reveal-up" style="--delay: 60ms;">
+    <div class="admin-toolbar mb-3">
+      <h2>Список уроков</h2>
+      <a href="/admin/courses/{{ course.id }}/lessons/new" class="nh-btn primary">+ Новый урок</a>
+    </div>
+
+    {% if lessons %}
+    <div class="table-responsive">
+      <table class="table admin-table align-middle table-hover">
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Видео</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lesson in lessons %}
+          <tr>
+            <td><strong>{{ lesson.title }}</strong></td>
+            <td>
+              {% if lesson.video_path_1080 or lesson.video_path_720 %}
+              <span class="nh-kicker" style="font-size:0.7rem;">Есть видео</span>
+              {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="admin-table-actions">
+                <a href="/lessons/{{ lesson.id }}" class="btn btn-secondary btn-sm">Открыть</a>
+                <a href="/admin/lessons/{{ lesson.id }}/edit" class="btn btn-primary btn-sm">Редактировать</a>
+                <form
+                  action="/admin/lessons/{{ lesson.id }}/delete"
+                  method="post"
+                  class="d-inline"
+                  data-confirm-title="Удалить урок?"
+                  data-confirm-message="Видео, заметки и прогресс по этому уроку будут удалены."
+                  data-confirm-ok="Удалить"
+                  data-confirm-cancel="Отмена"
+                >
+                  <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="admin-empty">
+      <p class="mb-3">В этом курсе ещё нет уроков.</p>
+      <a href="/admin/courses/{{ course.id }}/lessons/new" class="nh-btn primary">Добавить первый урок</a>
+    </div>
+    {% endif %}
+
+    <div class="mt-3">
+      <a href="/admin/courses" class="nh-btn secondary">← К списку курсов</a>
+    </div>
+  </section>
 </div>
 {% endblock %}

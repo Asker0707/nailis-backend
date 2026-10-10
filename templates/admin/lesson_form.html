@@ -1,86 +1,82 @@
 {% extends "base.html" %}
-{% block title %}{{ "Редактировать" if lesson else "Новый" }} урок{% endblock %}
+{% block title %}{{ "Редактировать" if lesson else "Новый" }} урок | Nailis.hub{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="mb-4">
-    {{ "Редактировать урок" if lesson else "Новый урок" }} — {{ course.title }}
-  </h2>
+<div class="nh-page admin-page">
+  <header class="nh-surface admin-hero reveal-up">
+    <span class="nh-kicker">Админка · Урок</span>
+    <h1>{{ "Редактировать урок" if lesson else "Новый урок" }}</h1>
+    <p>Курс: {{ course.title }}</p>
+  </header>
 
-  <form
-    action="{{
-      '/admin/lessons/' ~ lesson.id ~ '/update'
-      if lesson
-      else '/admin/courses/' ~ course.id ~ '/lessons/create'
-    }}"
-    method="post"
-    enctype="multipart/form-data"
-  >
-    <!-- Название урока -->
-    <div class="mb-3">
-      <label for="title" class="form-label">Название урока</label>
-      <input
-        type="text"
-        name="title"
-        id="title"
-        class="form-control"
-        placeholder="Введите название урока"
-        value="{{ lesson.title if lesson else '' }}"
-        required
-      >
-    </div>
-
-    <!-- Текстовый контент урока -->
-    <div class="mb-3">
-      <label for="text_content" class="form-label">
-        Содержимое урока (Markdown поддерживается)
-      </label>
-      <textarea
-        name="text_content"
-        id="text_content"
-        class="form-control"
-        rows="8"
-        placeholder="Добавьте текст или разметку урока"
-      >{{ lesson.text_content if lesson else '' }}</textarea>
-      <div class="form-text">
-        Можно использовать Markdown для форматирования текста.
+  <section class="nh-surface reveal-up" style="--delay: 50ms;">
+    <form
+      class="admin-form"
+      action="{{
+        '/admin/lessons/' ~ lesson.id ~ '/update'
+        if lesson
+        else '/admin/courses/' ~ course.id ~ '/lessons/create'
+      }}"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <div>
+        <label class="form-label" for="title">Название урока</label>
+        <input
+          type="text"
+          name="title"
+          id="title"
+          class="form-control"
+          placeholder="Введите название урока"
+          value="{{ lesson.title if lesson else '' }}"
+          required
+        >
       </div>
-    </div>
 
-    <!-- Загрузка видео -->
-    <div class="mb-3">
-      <label for="video_file" class="form-label">Видео (mp4, webm, ogg)</label>
-      <input
-        type="file"
-        name="video_file"
-        id="video_file"
-        accept="video/*"
-        class="form-control"
-      >
-      {% if lesson and lesson.video_path %}
+      <div>
+        <label class="form-label" for="text_content">Содержимое урока (Markdown)</label>
+        <textarea
+          name="text_content"
+          id="text_content"
+          class="form-control"
+          rows="8"
+          placeholder="Добавьте текст или разметку урока"
+        >{{ lesson.text_content if lesson else '' }}</textarea>
+        <div class="form-text">Можно использовать Markdown для форматирования текста.</div>
+      </div>
+
+      <div>
+        <label class="form-label" for="video_file">Видео (mp4, webm, ogg)</label>
+        <input
+          type="file"
+          name="video_file"
+          id="video_file"
+          accept="video/*"
+          class="form-control"
+        >
+        {% set current_video = (lesson.video_path_1080 or lesson.video_path_720) if lesson else None %}
+        {% if current_video %}
+        {% set preview_quality = '1080p' if lesson.video_path_1080 else '720p' %}
+        {% set preview_url = '/media/lessons/' ~ lesson.id ~ '/' ~ preview_quality %}
         <div class="mt-2">
-          <small class="text-muted">
-            Текущее видео: {{ lesson.video_path.split('/')[-1] }}
-          </small>
+          <small class="text-muted">Текущее видео: {{ current_video.split('/')[-1] }}</small>
         </div>
         <div class="mt-2">
-          <video controls width="320">
-            <source src="/{{ lesson.video_path }}">
+          <video controls class="admin-video-preview">
+            <source src="{{ preview_url }}">
             Ваш браузер не поддерживает видео.
           </video>
         </div>
-      {% endif %}
-    </div>
+        {% endif %}
+      </div>
 
-    <!-- Кнопки -->
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary">
-        {{ "Сохранить изменения" if lesson else "Создать урок" }}
-      </button>
-      <a href="/admin/courses/{{ course.id }}/lessons" class="btn btn-secondary">
-        Назад к списку уроков
-      </a>
-    </div>
-  </form>
+      <div class="admin-form-actions is-sticky">
+        <button type="submit" class="nh-btn primary">
+          {{ "Сохранить изменения" if lesson else "Создать урок" }}
+        </button>
+        <a href="/admin/courses/{{ course.id }}/lessons" class="nh-btn secondary">Назад к списку уроков</a>
+      </div>
+    </form>
+  </section>
 </div>
 {% endblock %}

@@ -1,0 +1,23 @@
+{# Shared UI macros for Nailis.hub templates #}
+
+{% macro csrf_input() -%}
+<input type="hidden" name="csrf_token" value="{{ csrf_token|default('', true) }}" />
+{%- endmacro %}
+
+{% macro kicker(text) -%}
+<span class="nh-kicker">{{ text }}</span>
+{%- endmacro %}
+
+{% macro btn(href, label, kind='primary', icon=None) -%}
+<a href="{{ href }}" class="nh-btn {{ kind }}">
+  {% if icon %}<i class="bi {{ icon }}" aria-hidden="true"></i> {% endif %}{{ label }}
+</a>
+{%- endmacro %}
+
+{% macro page_hero(kicker_text, title, subtitle=None) -%}
+<header class="nh-surface admin-hero reveal-up">
+  {{ kicker(kicker_text) }}
+  <h1>{{ title }}</h1>
+  {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+</header>
+{%- endmacro %}

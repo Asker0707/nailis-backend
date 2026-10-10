@@ -14,6 +14,8 @@
 """
 
 
+import os
+
 from pydantic_settings import BaseSettings
 
 
@@ -51,8 +53,30 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
     LOGIN_ATTEMPTS_LIMIT: int
+    LOGIN_ATTEMPTS_WINDOW_SECONDS: int = 900
+    MIN_PASSWORD_LENGTH: int = 8
+    MAX_VIDEO_UPLOAD_MB: int = 50000
     REFRESH_TOKEN_EXPIRE_DAYS: int
-
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    SMTP_TLS: bool = True
+    EMAIL_FROM: str
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
+    DATABASE_URL_SYNC: str
+    TELEGRAM_BOT_TOKEN: str
+    TELEGRAM_CHAT_ID: str
+    FLOWER_PASSWORD: str
+    UID: int
+    GID: int
+    ADMIN_EMAIL: str | None = None
+    ADMIN_PASSWORD: str | None = None
+    # Куда дублировать заявки «Оставить контакты» (временно можно поменять в .env)
+    LEADS_NOTIFY_EMAIL: str = "asker_original@mail.ru"
+    BASE_DIR: str = os.getcwd()
+    ENV: str = "development"
     class Config:
         """Конфигурация для загрузки настроек.
 

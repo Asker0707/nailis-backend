@@ -1,0 +1,538 @@
+/*
+ * «Что говорят те, кто уже прошёл обучение» — мессенджер: список переписок
+ * с ученицами + открытый чат. На телефоне список — лента аватарок сверху.
+ * Скрытие сообщений до анимации — только под html.nh-motion (без JS видно всё).
+ */
+
+.msgr {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  height: clamp(480px, 70vh, 600px);
+  overflow: hidden;
+  border-radius: 1.6rem;
+  border: 1px solid rgba(49, 27, 20, 0.12);
+  background: #fbf8f2;
+  box-shadow: 0 24px 60px rgba(49, 27, 20, 0.14);
+}
+
+/* ---------- список переписок ---------- */
+
+.msgr-side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid rgba(49, 27, 20, 0.1);
+}
+
+.msgr-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1rem 1.1rem 0.8rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #311b14;
+}
+
+.msgr-demo {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px dashed #b4532a;
+  color: #b4532a;
+  font-size: 0.7rem;
+  font-weight: 400;
+  cursor: help;
+}
+
+.msgr-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 0.45rem 0.6rem;
+}
+
+.msgr-item {
+  display: grid;
+  grid-template-columns: 2.9rem minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.6rem 0.65rem;
+  border: 0;
+  border-radius: 0.9rem;
+  background: transparent;
+  text-align: left;
+  color: #311b14;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.msgr-item:hover {
+  background: rgba(49, 27, 20, 0.05);
+}
+
+.msgr-item[aria-selected="true"] {
+  background: #311b14;
+  color: #ede6d8;
+}
+
+.msgr-item:focus-visible {
+  outline: 2px solid #311b14;
+  outline-offset: 2px;
+}
+
+.msgr-item-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.15rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.msgr-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.msgr-item-top time {
+  flex: none;
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
+
+.msgr-item-preview {
+  overflow: hidden;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+}
+
+.msgr-item-preview > span {
+  font-weight: 600;
+}
+
+.msgr-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 50%;
+  object-fit: cover;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.msgr-avatar--sm {
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 0.95rem;
+}
+
+.msgr-avatar--0 { background: #c47b5a; }
+.msgr-avatar--1 { background: #8a6a9e; }
+.msgr-avatar--2 { background: #5f8a72; }
+.msgr-avatar--3 { background: #b0894a; }
+
+/* ---------- открытый чат ---------- */
+
+.msgr-panes {
+  position: relative;
+  min-height: 0;
+}
+
+.msgr-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background:
+    radial-gradient(circle at 12px 12px, rgba(49, 27, 20, 0.07) 1.5px, transparent 2px) 0 0 / 28px 28px,
+    linear-gradient(160deg, #efe4d3 0%, #e6d6c0 100%);
+}
+
+.msgr-chat[hidden] {
+  display: none;
+}
+
+.msgr-chat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem 1.1rem;
+  background: rgba(251, 248, 242, 0.94);
+  border-bottom: 1px solid rgba(49, 27, 20, 0.1);
+  font-family: "Poppins", sans-serif;
+}
+
+.msgr-chat-head div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.msgr-chat-head b {
+  font-size: 0.95rem;
+  color: #311b14;
+}
+
+.msgr-chat-head div > span {
+  font-size: 0.76rem;
+  color: rgba(49, 27, 20, 0.6);
+}
+
+.msgr-feed {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  margin: 0;
+  padding: 1.1rem 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+}
+
+.msgr-row {
+  display: flex;
+}
+
+.msgr-row--out {
+  justify-content: flex-end;
+}
+
+/* серии сообщений одного человека — плотнее */
+.msgr-row--in + .msgr-row--in,
+.msgr-row--out + .msgr-row--out {
+  margin-top: -0.25rem;
+}
+
+.msgr-bubble {
+  max-width: min(28rem, 82%);
+  padding: 0.55rem 0.8rem 0.4rem;
+  border-radius: 1.05rem 1.05rem 1.05rem 0.3rem;
+  background: #fffdf9;
+  color: #2a1a14;
+  box-shadow: 0 1px 2px rgba(49, 27, 20, 0.12);
+  transform-origin: 0% 100%;
+}
+
+.msgr-row--out .msgr-bubble {
+  border-radius: 1.05rem 1.05rem 0.3rem 1.05rem;
+  background: #311b14;
+  color: #ede6d8;
+  transform-origin: 100% 100%;
+}
+
+.msgr-text {
+  margin: 0;
+  white-space: pre-line; /* переносы строк как в оригинальном сообщении */
+  font-family: "Poppins", sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.msgr-time {
+  display: block;
+  margin-top: 0.1rem;
+  text-align: right;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.68rem;
+  opacity: 0.55;
+}
+
+.msgr-ticks {
+  letter-spacing: -0.2em;
+  color: #8fc1e8;
+}
+
+/* фото в сообщении */
+.msgr-bubble--photo {
+  padding: 0.25rem;
+}
+
+.msgr-bubble--photo .msgr-time {
+  padding: 0 0.45rem 0.2rem;
+}
+
+.msgr-photo {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  background: none;
+  cursor: zoom-in;
+}
+
+.msgr-photo img {
+  display: block;
+  width: min(15rem, 60vw);
+  height: auto;
+  aspect-ratio: 501 / 632;
+  object-fit: cover;
+}
+
+/* кнопка «Оригинал» в шапке чата */
+.msgr-original {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  border: 1px solid rgba(49, 27, 20, 0.16);
+  border-radius: 999px;
+  background: #fff;
+  color: #311b14;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.8rem;
+  cursor: zoom-in;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.msgr-original:hover,
+.msgr-original:focus-visible {
+  border-color: rgba(49, 27, 20, 0.4);
+  box-shadow: 0 4px 12px rgba(49, 27, 20, 0.12);
+}
+
+.msgr-original img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.msgr-photo:focus-visible,
+.msgr-original:focus-visible {
+  outline: 2px solid #311b14;
+  outline-offset: 2px;
+}
+
+/* просмотр оригинала */
+.msgr-lightbox {
+  width: min(92vw, 640px);
+  max-height: 92vh;
+  padding: 0;
+  border: 0;
+  border-radius: 1.2rem;
+  background: transparent;
+  overflow: visible;
+}
+
+.msgr-lightbox::backdrop {
+  background: rgba(20, 10, 8, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.msgr-lightbox img {
+  display: block;
+  width: 100%;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 1.2rem;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.msgr-lightbox[open] img {
+  animation: msgrZoomIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes msgrZoomIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+
+.msgr-lightbox-close {
+  position: absolute;
+  top: -0.6rem;
+  right: -0.6rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: #ede6d8;
+  color: #311b14;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* «печатает…» */
+.msgr-typing {
+  display: none;
+  gap: 0.25rem;
+  padding: 0.35rem 0.1rem;
+}
+
+.msgr-typing i {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+  animation: msgrDot 1s ease-in-out infinite;
+}
+
+.msgr-typing i:nth-child(2) { animation-delay: 0.15s; }
+.msgr-typing i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes msgrDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.msgr-row.is-typing .msgr-bubble > :not(.msgr-typing) {
+  display: none;
+}
+
+.msgr-row.is-typing .msgr-typing {
+  display: inline-flex;
+}
+
+html.nh-motion .msgr-row:not(.is-typing):not(.is-shown) {
+  display: none; /* в чате новые сообщения «приходят» снизу, как в мессенджере */
+}
+
+/* ---------- «поле ввода» = кнопка записи ---------- */
+
+.msgr-compose {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(251, 248, 242, 0.96);
+  border-top: 1px solid rgba(49, 27, 20, 0.1);
+}
+
+.msgr-compose-hint {
+  font-family: "Isadora Cyr", "Lora", cursive;
+  font-size: 1.25rem;
+  color: #311b14;
+}
+
+.msgr-compose-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  background: #311b14;
+  color: #ede6d8;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.msgr-compose-btn:hover,
+.msgr-compose-btn:focus-visible {
+  background: #5b2a20;
+  color: #fff;
+}
+
+.msgr-compose-btn:focus-visible {
+  outline: 2px solid #311b14;
+  outline-offset: 3px;
+}
+
+/* ---------- телефон: аватарки лентой сверху ---------- */
+
+@media (max-width: 760px) {
+  .msgr {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    margin-inline: -0.4rem;
+  }
+
+  .msgr-side {
+    border-right: 0;
+    border-bottom: 1px solid rgba(49, 27, 20, 0.1);
+  }
+
+  .msgr-side-head {
+    padding-bottom: 0.4rem;
+  }
+
+  .msgr-list {
+    flex-direction: row;
+    gap: 0.25rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 0.6rem 0.8rem;
+    scrollbar-width: none;
+  }
+
+  .msgr-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .msgr-item {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 4.6rem;
+    padding: 0.4rem 0.2rem;
+    text-align: center;
+  }
+
+  .msgr-item[aria-selected="true"] {
+    background: transparent;
+    color: #311b14;
+  }
+
+  .msgr-item[aria-selected="true"] .msgr-avatar {
+    box-shadow: 0 0 0 2px #fbf8f2, 0 0 0 4px #311b14;
+  }
+
+  .msgr-item-top {
+    justify-content: center;
+    font-size: 0.78rem;
+  }
+
+  .msgr-item-top time,
+  .msgr-item-preview {
+    display: none;
+  }
+
+  .msgr-feed {
+    min-height: 18rem;
+    max-height: 60vh;
+    max-height: 60svh;
+  }
+
+  .msgr-compose {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .msgr-original span {
+    display: none; /* на узком экране — только миниатюра */
+  }
+
+  .msgr-original {
+    padding: 0.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msgr-typing i,
+  .msgr-lightbox[open] img {
+    animation: none;
+  }
+}

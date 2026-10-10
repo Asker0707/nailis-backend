@@ -30,6 +30,7 @@
 - **Auth:** JWT + bcrypt
 - **Containerization:** Docker & Docker Compose
 - **Tests:** pytest + pytest-asyncio + httpx
+- **Background jobs:** Celery + RabbitMQ
 
 ---
 
@@ -41,9 +42,7 @@ git clone git@github.com:Asker0707/FastApi_Nail_Project.git
 ```
 
 ### 2. Настроить переменные окружения
-Создайте .env в корне. Для примера используйте файл 
-
-#### .env.example
+Создайте `.env` в корне проекта и заполните все необходимые переменные.
 
 ### 🚀 Запуск с Docker Compose
 Убедитесь, что у вас установлен **Docker** и **Docker Compose**
@@ -55,16 +54,20 @@ docker compose up --build
 
 ### Приложение будет доступно на:
 
-http://localhost:8000 — сайт
+http://localhost:8001 — сайт
 
-http://localhost:8000/docs — Swagger UI
+http://localhost:8001/docs — Swagger UI
 
 ### Создать админа для тестирования добавления, редактирования и удаления курсов и уроков
+Добавьте в `.env`:
+```bash
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=strong-password
+```
+После этого выполните:
 ```bash
 docker compose exec web python create_admin.py
 ```
-Логин: admin@example.com
-Пароль: admin123
 
 ## 🔒 Модуль аутентификации
 
@@ -87,7 +90,7 @@ docker compose exec web python create_admin.py
 | GET   | `/auth/login`         | Страница входа | Все |
 | POST  | `/auth/login`         | Вход пользователя | Все |
 | POST  | `/auth/admin_login`   | Вход администратора | Только админ |
-| GET   | `/auth/logout`        | Выход пользователя | Авторизованные |
+| POST  | `/auth/logout`        | Выход пользователя | Авторизованные |
 
 
 

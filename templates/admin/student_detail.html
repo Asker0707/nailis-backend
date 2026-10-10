@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Доступы: {{ student.full_name or student.email }} | Nailis.hub{% endblock %}
+
+{% block content %}
+<div class="nh-page admin-page">
+  <header class="nh-surface admin-hero reveal-up">
+    <span class="nh-kicker">Админка</span>
+    <h1>{{ student.full_name or 'Ученик' }}</h1>
+    <p>{{ student.email }} · управление доступом к курсам</p>
+  </header>
+
+  <section class="nh-surface admin-panel reveal-up" style="--delay: 40ms;">
+    <div class="admin-toolbar mb-3">
+      <h2>Курсы</h2>
+      <a href="/admin/students" class="nh-btn secondary">← К списку</a>
+    </div>
+
+    {% if courses %}
+    <div class="students-table-wrap table-responsive">
+      <table class="table admin-table align-middle">
+        <thead>
+          <tr>
+            <th>Курс</th>
+            <th>Тип</th>
+            <th>Статус</th>
+            <th>Действие</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in courses %}
+          {% set granted = course.id in granted_ids %}
+          <tr>
+            <td>
+              <strong>{{ course.title }}</strong>
+              {% if course.description %}
+              <div class="text-muted small">{{ course.description|truncate(90, True, '...') }}</div>
+              {% endif %}
+            </td>
+            <td>
+              {% if course.is_free %}
+              <span class="badge text-bg-success">Бесплатный / открыт всем</span>
+              {% else %}
+              <span class="badge text-bg-secondary">Платный</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if course.is_free %}
+              Открыт всем зарегистрированным
+              {% elif granted %}
+              Выдан{% if grant_by_course[course.id].granted_at %} · {{ grant_by_course[course.id].granted_at.strftime('%d.%m.%Y') }}{% endif %}
+              {% else %}
+              Закрыт
+              {% endif %}
+            </td>
+            <td>
+              {% if course.is_free %}
+              <span class="text-muted">Не требуется</span>
+              {% elif granted %}
+              <form
+                action="/admin/students/{{ student.id }}/access/revoke"
+                method="post"
+                class="d-inline"
+                data-confirm-title="Закрыть доступ?"
+                data-confirm-message="Ученик потеряет доступ к этому курсу."
+                data-confirm-ok="Закрыть доступ"
+                data-confirm-cancel="Отмена"
+              >
+                <input type="hidden" name="course_id" value="{{ course.id }}">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Закрыть доступ</button>
+              </form>
+              {% else %}
+              <form action="/admin/students/{{ student.id }}/access/grant" method="post" class="d-flex gap-2 align-items-center flex-wrap">
+                <input type="hidden" name="course_id" value="{{ course.id }}">
+                <input type="text" name="note" class="form-control form-control-sm" placeholder="Комментарий (опц.)" style="min-width: 140px;">
+                <button type="submit" class="btn btn-success btn-sm">Открыть доступ</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="admin-empty">
+      <p class="mb-0">Курсов пока нет.</p>
+    </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

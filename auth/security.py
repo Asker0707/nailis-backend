@@ -61,14 +61,17 @@ def create_jwt_token(
 def create_access_token(data: dict) -> str:
     """Создает JWT access токен"""
     return create_jwt_token(
-        data,
+        {**data, "token_type": "access"},
         timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
 
 
 def create_refresh_token(data: dict) -> str:
-    """Создает JWT refresh токен на 30 дней"""
-    return create_jwt_token(data, timedelta(days=30))
+    """Создает JWT refresh токен"""
+    return create_jwt_token(
+        {**data, "token_type": "refresh"},
+        timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+    )
 
 
 
@@ -76,9 +79,13 @@ async def add_to_blacklist(token: str, raise_on_error: bool = False):
     """Добавить JWT токен в черный список Redis на время жизни токена"""
     try:
         expire_seconds = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        claims = jwt.get_unverified_claims(token)
+        exp = claims.get("exp")
+        if isinstance(exp, (int, float)):
+            expire_seconds = max(int(exp - utc_now().timestamp()), 1)
         await redis.setex(f"blacklist:{token}", expire_seconds, "1")
         logger.info("Токен успешно добавлен в черный список")
-    except RedisError as e:
+    except (RedisError, JWTError, TypeError, ValueError) as e:
         logger.error("Ошибка при добавлении токена в черный список: %s", e)
         if raise_on_error:
             raise
@@ -92,11 +99,58 @@ async def is_token_blacklisted(token: str) -> bool:
         return exists
     except RedisError as e:
         logger.error("Ошибка при проверке токена в черном списке: %s", e)
+        # Fail open on Redis outage to avoid locking out all users
         return False
 
 
+def _login_attempts_key(email: str) -> str:
+    return f"login_attempts:{email.lower().strip()}"
 
-async def decode_token(token: Optional[str], raise_exc: bool = True) -> Optional[str]:
+
+async def check_login_rate_limit(email: str) -> None:
+    """Блокирует вход при превышении LOGIN_ATTEMPTS_LIMIT."""
+    key = _login_attempts_key(email)
+    try:
+        raw = await redis.get(key)
+        attempts = int(raw) if raw is not None else 0
+    except (RedisError, TypeError, ValueError) as e:
+        logger.error("Не удалось проверить лимит входа: %s", e)
+        return
+
+    if attempts >= settings.LOGIN_ATTEMPTS_LIMIT:
+        logger.warning("Превышен лимит попыток входа для %s", email)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Слишком много попыток входа. Попробуйте позже.",
+        )
+
+
+async def register_failed_login(email: str) -> None:
+    """Увеличивает счётчик неудачных попыток входа."""
+    key = _login_attempts_key(email)
+    window = getattr(settings, "LOGIN_ATTEMPTS_WINDOW_SECONDS", 900)
+    try:
+        attempts = await redis.incr(key)
+        if attempts == 1:
+            await redis.expire(key, window)
+    except RedisError as e:
+        logger.error("Не удалось обновить счётчик попыток входа: %s", e)
+
+
+async def clear_failed_logins(email: str) -> None:
+    """Сбрасывает счётчик после успешного входа."""
+    try:
+        await redis.delete(_login_attempts_key(email))
+    except RedisError as e:
+        logger.error("Не удалось сбросить счётчик попыток входа: %s", e)
+
+
+
+async def decode_token(
+    token: Optional[str],
+    raise_exc: bool = True,
+    expected_token_type: Optional[str] = None,
+) -> Optional[str]:
     """
     Декодировать JWT токен, проверить черный список
     и вернуть email пользователя
@@ -119,6 +173,21 @@ async def decode_token(token: Optional[str], raise_exc: bool = True) -> Optional
         payload = jwt.decode(token, settings.SECRET_KEY,
                              algorithms=[settings.ALGORITHM])
         email = payload.get("sub")
+        token_type = payload.get("token_type")
+
+        if expected_token_type and token_type != expected_token_type:
+            if raise_exc:
+                logger.warning(
+                    "Ожидался токен типа %s, получен %s",
+                    expected_token_type,
+                    token_type,
+                )
+                raise HTTPException(
+                    status.HTTP_401_UNAUTHORIZED,
+                    detail="Неверный тип токена",
+                )
+            return None
+
         if not isinstance(email, str):
             if raise_exc:
                 logger.warning(

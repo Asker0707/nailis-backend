@@ -2,67 +2,123 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>{% block title %}Онлайн обучение маникюру{% endblock %}</title>
+  {% if static_site %}
+  {# Статическая сборка: CSP в meta — на хостингах без своих заголовков (GitHub Pages) это единственный способ #}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  {% endif %}
+  <title>{% block title %}Nailis.hub — обучение маникюру{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Онлайн платформа для обучения маникюру. Курсы, уроки и сертификация." />
-  <meta name="keywords" content="маникюр, онлайн обучение, курсы, уроки, nail art" />
+  <meta name="description" content="{% block meta_description %}Онлайн и очное обучение маникюру: курсы, уроки, практика и кабинет студента на Nailis.hub.{% endblock %}" />
+  <meta name="keywords" content="маникюр, онлайн обучение, курсы, уроки, nail art, Nailis.hub" />
+  <meta name="theme-color" content="#311B14" />
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Nailis.hub" />
+  <meta property="og:title" content="{% block og_title %}Nailis.hub — обучение маникюру{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}Индивидуальное обучение маникюру: практика, современные техники и личный кабинет.{% endblock %}" />
+  <meta property="og:locale" content="ru_RU" />
+  {# site_url задаёт статическая сборка (deploy/landing): соцсети и поисковики требуют абсолютные адреса #}
+  {% if site_url %}
+  <link rel="canonical" href="{{ site_url }}{% block canonical_path %}/{% endblock %}" />
+  <meta property="og:url" content="{{ site_url }}{{ self.canonical_path() }}" />
+  {% endif %}
+  <meta property="og:image" content="{{ site_url|default('', true) }}/static/images/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="{{ site_url|default('', true) }}/static/images/og-image.jpg" />
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/static/images/icons/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/static/images/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/static/images/icons/apple-touch-icon.png" />
 
-  <!-- Base CSS -->
-  <link href="/static/css/base.css" rel="stylesheet" />
+  <link href="/static/vendor/bootstrap.min.css" rel="stylesheet" />
+  <link href="/static/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="/static/vendor/fonts/fonts.css" rel="stylesheet" />
+
+  <link href="/static/css/base.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
+  <link href="/static/css/app.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
+
+  {% if not static_site %}<meta name="csrf-token" content="{{ csrf_token|default('', true) }}" />{% endif %}
 
   {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}app-surface{% endblock %}">
+  <a class="skip-link" href="#main">К содержанию</a>
 
   {% block navbar %}
-  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top site-navbar" role="navigation" aria-label="Главная навигация">
     <div class="container">
-      <a class="navbar-brand" href="/">Nailis.hub</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
-          {% if user %}
-          <li class="nav-item"><a class="nav-link" href="/user/dashboard">Кабинет</a></li>
-          <li class="nav-item"><a class="nav-link" href="/user/profile">Профиль</a></li>
-          <li class="nav-item"><a class="nav-link" href="/courses">Курсы</a></li>
-          {% if user.is_admin %}
-          <li class="nav-item"><a class="nav-link" href="/admin/courses">Админка</a></li>
-          {% endif %}
-          <li class="nav-item"><a class="nav-link" href="/auth/logout">Выход</a></li>
-          {% else %}
-      
-          <li class="nav-item"><a class="nav-link" href="/auth/login">Войти</a></li>
-          <li class="nav-item"><a class="nav-link" href="/auth/register">Регистрация</a></li>
-          {% endif %}
-          
-        </ul>
+      <div class="navbar-shell">
+        <a class="navbar-brand" href="/" aria-label="Nailis hub — главная">
+          <span class="brand-mark">N</span>
+          <span class="brand-copy">
+            <span class="brand-name" translate="no">Nailis.hub</span>
+            <span class="brand-subtitle">education space</span>
+          </span>
+        </a>
+        {% if user %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Меню">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link {% if request.url.path == '/' %}is-active{% endif %}" href="/">Главная</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/user/dashboard') %}is-active{% endif %}" href="/user/dashboard">Кабинет</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/user/profile') %}is-active{% endif %}" href="/user/profile">Профиль</a></li>
+            {# временно скрыто: Курсы / Войти / Регистрация
+            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/courses') or request.url.path.startswith('/lessons') %}is-active{% endif %}" href="/courses">Курсы</a></li>
+            #}
+            {% if user.is_admin %}
+            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/admin/courses') or request.url.path.startswith('/admin/lessons') %}is-active{% endif %}" href="/admin/courses">Админка</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/admin/students') %}is-active{% endif %}" href="/admin/students">Ученики</a></li>
+            {% endif %}
+            <li class="nav-item nav-item-action">
+              <form action="/auth/logout" method="post" class="m-0">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token|default('', true) }}" />
+                <button type="submit" class="nav-link nav-logout-btn">Выход</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+        {% endif %}
       </div>
     </div>
   </nav>
   {% endblock %}
 
-  <div class="vertical-watermark">Nailis.hub</div>
-  {% block hero %}
-  {% endblock %}
-  <main class="container">
+  <div class="vertical-watermark" aria-hidden="true">Nailis.hub</div>
+
+  {% block hero %}{% endblock %}
+
+  <main id="main" class="container main-content {% block main_class %}app-wide{% endblock %}" role="main" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="footer">
-    &copy; 2025 Маникюр Онлайн. Все права защищены.
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <strong>Nailis.hub</strong>
+        <span>Олеся Дышекова · обучение маникюру</span>
+      </div>
+      <div class="footer-links">
+        {# временно скрыто: <a href="/courses">Курсы</a> #}
+        <a href="/privacy">Политика ПДн</a>
+        <a href="/offer">Оферта</a>
+        <a href="{{ telegram_url|default('https://t.me/Dyshekova_Olesia') }}" target="_blank" rel="noopener">Telegram</a>
+        <a href="{{ instagram_url|default('https://www.instagram.com/nailis.hub/') }}" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <div class="footer-copy">&copy; 2026 Nailis.hub</div>
+    </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% if not static_site %}
+  {# статической странице (deploy/landing) это не нужно: нет форм, входа и меню кабинета #}
+  <script src="/static/vendor/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/csrf.js?v=3"></script>
+  <script src="/static/js/toast.js?v=1" defer></script>
+  <script src="/static/js/confirm-dialog.js?v=2" defer></script>
+  {% endif %}
   {% block extra_js %}{% endblock %}
 </body>
 </html>

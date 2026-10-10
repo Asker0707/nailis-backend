@@ -24,6 +24,20 @@ from auth.dependencies import get_current_user
 from db import models
 from db.database import get_db
 from schemas.note import NoteIn, NoteOut, MessageOut
+from services.course_access import get_course_for_lesson, user_has_course_access
+
+
+async def _require_lesson_course_access(
+    lesson_id: UUID,
+    current_user: models.User,
+    db: AsyncSession,
+) -> models.Lesson:
+    lesson, course = await get_course_for_lesson(lesson_id, db)
+    if not lesson or not course:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Урок не найден")
+    if not await user_has_course_access(current_user, course, db):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Нет доступа к курсу")
+    return lesson
 
 router = APIRouter(prefix="/lessons", tags=["Заметки"])
 
@@ -51,6 +65,7 @@ async def read_notes(
         HTTPException 401: Если пользователь не аутентифицирован
         (обрабатывается зависимостью).
     """
+    await _require_lesson_course_access(lesson_id, current_user, db)
     stmt = (
         select(models.Note)
         .where(
@@ -94,11 +109,7 @@ async def create_note(
         HTTPException 404: Если урок с таким lesson_id не найден.
         HTTPException 401: Если пользователь не аутентифицирован.
     """
-    lesson_exists = await db.execute(
-        select(models.Lesson).filter(models.Lesson.id == lesson_id)
-    )
-    if not lesson_exists.scalars().first():
-        raise HTTPException(status_code=404, detail="Урок не найден")
+    await _require_lesson_course_access(lesson_id, current_user, db)
 
     note = models.Note(
         user_id=current_user.id,
@@ -140,6 +151,7 @@ async def update_note(
                            для пользователя не найдена.
         HTTPException 401: Если пользователь не аутентифицирован.
     """
+    await _require_lesson_course_access(lesson_id, current_user, db)
     stmt = select(models.Note).where(
         models.Note.id == note_id,
         models.Note.lesson_id == lesson_id,
@@ -182,6 +194,7 @@ async def delete_note(
                            для пользователя не найдена.
         HTTPException 401: Если пользователь не аутентифицирован.
     """
+    await _require_lesson_course_access(lesson_id, current_user, db)
     stmt = select(models.Note).where(
         models.Note.id == note_id,
         models.Note.lesson_id == lesson_id,

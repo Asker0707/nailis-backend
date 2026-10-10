@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Страница не найдена | Nailis.hub{% endblock %}
+{% block canonical_path %}/404{% endblock %}
+{% block body_class %}page-home{% endblock %}
+{% block extra_css %}
+  <link href="/static/css/index-page.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
+  <style>
+    .nf { min-height: 60vh; display: grid; place-content: center; gap: 1.2rem; text-align: center; padding: 6rem 1rem 3rem; color: #ede6d8; }
+    .nf h1 { margin: 0; font-family: "Isadora Cyr", "Lora", cursive; font-weight: 400; font-size: clamp(2.2rem, 6vw, 3.6rem); }
+    .nf p { margin: 0; font-family: "Poppins", sans-serif; opacity: 0.8; }
+    .nf a { justify-self: center; padding: 0.8rem 1.6rem; border-radius: 999px; background: #ede6d8; color: #311b14; font-family: "Poppins", sans-serif; text-decoration: none; }
+  </style>
+{% endblock %}
+{% block content %}
+<section class="nf">
+  <h1>Страница не найдена</h1>
+  <p>Возможно, ссылка устарела. Всё самое важное — на главной.</p>
+  <a href="/">На главную</a>
+</section>
+{% endblock %}

@@ -1,341 +1,130 @@
 {% extends "base.html" %}
 {% block title %}Регистрация | Nailis.hub{% endblock %}
+
 {% block extra_css %}
-<style>
-  .register-container {
-    position: relative;
-    z-index: 10;
-    max-width: 500px;
-    margin: 5rem auto;
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
-  .register-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  
-  .register-header h2 {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    color: #a36b5e;
-    position: relative;
-    padding-bottom: 1rem;
-  }
-  
-  .register-header h2:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-    border-radius: 3px;
-  }
-  
-  .form-control {
-    padding: 0.75rem 1.25rem;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-    transition: all 0.3s;
-    font-size: 1rem;
-  }
-  
-  .form-control:focus {
-    border-color: #6a11cb;
-    box-shadow: 0 0 0 0.25rem rgba(106, 17, 203, 0.1);
-  }
-  
-  .input-group {
-    position: relative;
-    margin-bottom: 1.5rem;
-  }
-  
-  .input-group .bi {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 15px;
-    color: #6a11cb;
-    font-size: 1.2rem;
-  }
-  
-  .input-group input {
-    padding-left: 45px;
-  }
-  
-  .form-label {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  .btn-register {
-    background: linear-gradient(to right, #a36b5e, #803b2c);
-    border: none;
-    border-radius: 12px;
-    padding: 0.8rem;
-    font-weight: 600;
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(106, 17, 203, 0.2);
-  }
-  
-  .btn-register:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(106, 17, 203, 0.3);
-  }
-  
-  .login-link {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    color: #666;
-  }
-  
-  .login-link a {
-    color: #a36b5e;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-  
-  .login-link a:hover {
-    color: #803423;
-    text-decoration: underline;
-  }
-  
-  .divider {
-    display: flex;
-    align-items: center;
-    margin: 1.5rem 0;
-  }
-  
-  .divider::before,
-  .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #ddd, transparent);
-  }
-  
-  .divider span {
-    padding: 0 15px;
-    color: #777;
-    font-size: 0.9rem;
-  }
-  
-  .social-login {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 1rem;
-  }
-  
-  .social-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    color: #555;
-    font-size: 1.2rem;
-    transition: all 0.3s;
-  }
-  
-  .social-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .social-btn.google:hover { background: #f1f1f1; color: #dd4b39; }
-  .social-btn.facebook:hover { background: #f1f1f1; color: #3b5998; }
-  .social-btn.vk:hover { background: #f1f1f1; color: #4a76a8; }
-  
-  .password-hint {
-    font-size: 0.85rem;
-    color: #777;
-    margin-top: 0.25rem;
-  }
-  
-  .terms {
-    font-size: 0.85rem;
-    color: #666;
-    text-align: center;
-    margin-top: 1.5rem;
-  }
-  
-  .terms a {
-    color: #af9711;
-    text-decoration: none;
-  }
-  
-  .terms a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Декоративные элементы */
-  .decoration-container {
-    position: relative;
-    min-height: 100vh;
-    overflow: hidden;
-  }
-  
-  .nail-decoration {
-    position: absolute;
-    z-index: 1;
-    opacity: 0.9;
-    max-width: 500px;
-    pointer-events: none;
-  }
-  
-  .decoration-left {
-    top: 10%;
-    left: 1%;
-    transform: rotate(-7deg);
-  }
-  
-  .decoration-right {
-    bottom: 10%;
-    right: 5%;
-    transform: rotate(15deg);
-    animation: floatRight 8s infinite ease-in-out;
-  }
-  
-  .decoration-center {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(5deg);
-    max-width: 250px;
-    opacity: 0.2;
-    z-index: 0;
-    animation: floatCenter 10s infinite ease-in-out;
-  }
-  
-  @keyframes floatLeft {
-    0%, 100% { transform: rotate(-15deg) translateY(0); }
-    50% { transform: rotate(-12deg) translateY(-20px); }
-  }
-  
-  @keyframes floatRight {
-    0%, 100% { transform: rotate(15deg) translateY(0); }
-    50% { transform: rotate(18deg) translateY(20px); }
-  }
-  
-  @keyframes floatCenter {
-    0%, 100% { transform: translate(-50%, -50%) rotate(5deg) scale(1); }
-    50% { transform: translate(-50%, -50%) rotate(8deg) scale(1.05); }
-  }
-  
-  @media (max-width: 1200px) {
-    .decoration-left,
-    .decoration-right {
-      max-width: 200px;
-    }
-  }
-  
-  @media (max-width: 992px) {
-    .decoration-left,
-    .decoration-right {
-      max-width: 150px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .decoration-left,
-    .decoration-right,
-    .decoration-center {
-      display: none;
-    }
-  }
-</style>
+  <link href="/static/css/pages/auth-register.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-<div class="decoration-container">
-  <!-- Левая декорация -->
-  <img src="/static/images/nail-polish-bottle.png" 
-       alt="Nail Art" class="nail-decoration decoration-left">
-  
-  <!-- Правая декорация -->
-  <img src="/static/images/2148109558-no-bg-preview (carve.photos).png" 
-       alt="Nail Design" class="nail-decoration decoration-right">
-  
-  <!-- Центральная декорация (фон) -->
-  <img src="/static/images/2151345087-Photoroom.png" 
-       alt="Nail Pattern" class="nail-decoration decoration-center">
-  
-  <div class="register-container">
-    <div class="register-header">
-      <h2>Создать аккаунт</h2>
-      <p>Присоединяйтесь к сообществу профессионалов маникюра</p>
-    </div>
+<div class="auth-page">
+    <section class="auth-card">
+      <div class="auth-card-head">
+        <div class="auth-card-kicker">Nailis.hub Start</div>
+        <h2 class="auth-card-title">Создать аккаунт</h2>
+        <p class="auth-card-subtitle">Нужны только имя, email и пароль, чтобы открыть кабинет, уроки и личные заметки внутри платформы.</p>
+        <div class="auth-benefits">
+          <article class="auth-benefit">
+            <div class="auth-benefit-icon"><i class="bi bi-journal-richtext"></i></div>
+            <strong>Уроки и курсы</strong>
+            <span>Откроются материалы и маршрут обучения.</span>
+          </article>
+          <article class="auth-benefit">
+            <div class="auth-benefit-icon"><i class="bi bi-pencil-square"></i></div>
+            <strong>Личный конспект</strong>
+            <span>Можно сохранять заметки прямо по ходу уроков.</span>
+          </article>
+          <article class="auth-benefit">
+            <div class="auth-benefit-icon"><i class="bi bi-person-badge"></i></div>
+            <strong>Кабинет и профиль</strong>
+            <span>Прогресс и настройки будут в одном месте.</span>
+          </article>
+        </div>
+      </div>
 
-    {% if flash_error %}
-    <div class="alert alert-danger" role="alert">
-      {{ flash_error }}
-    </div>
-    {% endif %}
+      {% if flash_error %}
+      <div class="auth-alert" role="alert">{{ flash_error }}</div>
+      {% else %}
+      <div class="auth-alert" role="alert" hidden></div>
+      {% endif %}
 
-    <form action="/auth/register" method="post">
-      <div class="mb-4">
-        <label class="form-label">Ваше имя</label>
-        <div class="input-group">
-          <i class="bi bi-person"></i>
-          <input type="text" class="form-control" name="full_name" placeholder="Иванова Анна" required>
+      <form action="/auth/register" method="post" class="auth-form">
+        <div class="auth-grid">
+          <label class="auth-field">
+            <span class="auth-label">Ваше имя</span>
+            <span class="auth-input-wrap">
+              <i class="bi bi-person auth-input-icon" aria-hidden="true"></i>
+              <input
+                type="text"
+                name="full_name"
+                class="auth-input"
+                placeholder="Иванова Анна"
+                autocomplete="name"
+                required
+              >
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-label">Email</span>
+            <span class="auth-input-wrap">
+              <i class="bi bi-envelope auth-input-icon" aria-hidden="true"></i>
+              <input
+                type="email"
+                name="email"
+                class="auth-input"
+                placeholder="example@mail.ru"
+                autocomplete="email"
+                required
+              >
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-label">Пароль</span>
+            <span class="auth-input-wrap">
+              <i class="bi bi-lock auth-input-icon" aria-hidden="true"></i>
+              <input
+                type="password"
+                name="password"
+                id="registerPassword"
+                class="auth-input has-toggle"
+                placeholder="Не менее 8 символов"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              >
+              <button type="button" class="auth-toggle" data-toggle-password="registerPassword" aria-label="Показать пароль">
+                <i class="bi bi-eye"></i>
+              </button>
+            </span>
+            <span class="auth-hint">Минимум 8 символов. Лучше комбинация букв и цифр.</span>
+          </label>
         </div>
-      </div>
-      
-      <div class="mb-4">
-        <label class="form-label">Email</label>
-        <div class="input-group">
-          <i class="bi bi-envelope"></i>
-          <input type="email" class="form-control" name="email" placeholder="example@mail.ru" required>
+
+        <div class="auth-consents">
+          <label class="auth-consent">
+            <input type="checkbox" name="privacy_consent" value="1" required />
+            <span>
+              Соглашаюсь на обработку персональных данных в соответствии с
+              <a href="/privacy" target="_blank" rel="noopener">Политикой обработки персональных данных</a>
+            </span>
+          </label>
+          <label class="auth-consent">
+            <input type="checkbox" name="offer_consent" value="1" required />
+            <span>
+              Принимаю условия
+              <a href="/offer" target="_blank" rel="noopener">публичной оферты</a>
+            </span>
+          </label>
         </div>
-      </div>
-      
-      <div class="mb-4">
-        <label class="form-label">Пароль</label>
-        <div class="input-group">
-          <i class="bi bi-lock"></i>
-          <input type="password" class="form-control" name="password" placeholder="Не менее 6 символов" required>
+
+        <button type="submit" class="auth-submit">
+          <i class="bi bi-person-plus" aria-hidden="true"></i> Зарегистрироваться
+        </button>
+
+        <div class="auth-links">
+          <a href="/auth/login" class="auth-link">Уже есть аккаунт? Войти</a>
         </div>
-        <div class="password-hint">Используйте буквы, цифры и специальные символы</div>
+      </form>
+
+      <div class="auth-footer">
+        Без согласия с политикой ПДн и офертой регистрация невозможна.
+        Если аккаунт уже есть, <a href="/auth/login">перейдите ко входу</a>.
       </div>
-      
-      <button type="submit" class="btn btn-primary w-100 btn-register">Зарегистрироваться</button>
-      
-      <div class="divider">
-        <span>или</span>
-      </div>
-      
-      <div class="social-login">
-        <a href="#" class="social-btn google"><i class="bi bi-google"></i></a>
-        <a href="#" class="social-btn facebook"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="social-btn vk"><i class="bi bi-chat-dots"></i></a>
-      </div>
-      
-      <div class="login-link">
-        Уже есть аккаунт? <a href="/auth/login">Войти</a>
-      </div>
-      
-      <div class="terms">
-        Нажимая кнопку "Зарегистрироваться", вы соглашаетесь с нашими 
-        <a href="#">Условиями использования</a> и <a href="#">Политикой конфиденциальности</a>
-      </div>
-    </form>
-  </div>
+    </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="/static/js/auth.js" defer></script>
 {% endblock %}
