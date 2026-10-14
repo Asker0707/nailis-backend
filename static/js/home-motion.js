@@ -404,6 +404,9 @@
   // ---------- FAQ: плавное раскрытие + параллакс фото ----------
   const faqItems = Array.from(document.querySelectorAll("[data-faq-list] details.faq-item"));
   const animating = new WeakSet();
+  // Нижний отступ ответа анимируем вместе с высотой: height: 0 его не убирает,
+  // и без этого карточка в конце закрытия замирает, а потом схлопывается рывком.
+  const FAQ_PROPS = "height,paddingBottom,opacity,visibility";
 
   const closeFaq = (item) => {
     const answer = item.querySelector(".faq-answer");
@@ -417,12 +420,13 @@
       { height: answer.offsetHeight },
       {
         height: 0,
+        paddingBottom: 0,
         autoAlpha: 0,
         duration: 0.45,
         ease: "power2.inOut",
         onComplete: () => {
           item.open = false;
-          gsap.set(answer, { clearProps: "height,opacity,visibility" });
+          gsap.set(answer, { clearProps: FAQ_PROPS });
           animating.delete(item);
         },
       },
@@ -444,16 +448,20 @@
       }
       item.open = true;
       animating.add(item);
+      // конечные размеры меряем до анимации: height: "auto" считался бы без отступа
+      const height = answer.offsetHeight;
+      const paddingBottom = getComputedStyle(answer).paddingBottom;
       gsap.fromTo(
         answer,
-        { height: 0, autoAlpha: 0 },
+        { height: 0, paddingBottom: 0, autoAlpha: 0 },
         {
-          height: "auto",
+          height,
+          paddingBottom,
           autoAlpha: 1,
           duration: 0.55,
           ease: "power3.out",
           onComplete: () => {
-            gsap.set(answer, { clearProps: "height,opacity,visibility" });
+            gsap.set(answer, { clearProps: FAQ_PROPS });
             animating.delete(item);
           },
         },

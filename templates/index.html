@@ -11,9 +11,10 @@
 {% endblock %}
 
 {% block content %}
-{# Форма «Перезвоните мне» требует сервера (/api/callback). В статической сборке
-   (deploy/landing) её нет — остаются кнопки Telegram и Instagram. #}
-{% set show_callback = not static_site %}
+{# Форма «Перезвоните мне» (/api/callback) пока выключена везде, чтобы приложение
+   совпадало с опубликованной статикой: остаются кнопки Telegram и Instagram.
+   Вернуть форму: show_callback = not static_site (в статике она работать не может). #}
+{% set show_callback = false %}
 {% macro home_marquee() -%}
 <div class="home-marquee" aria-hidden="true">
   <div class="home-marquee-track">
@@ -85,8 +86,8 @@
   <section class="home-section about-section about-section-v2" data-reveal>
     <div class="about-grid">
       <div class="about-portrait about-portrait--layered" data-depth-scene>
-        <div class="about-depth-back" aria-hidden="true" data-depth="-0.35">
-          <span class="about-depth-word" translate="no">Nailis</span>
+        <div class="about-depth-back" aria-hidden="true" data-depth="-0.2">
+          <span class="about-depth-word" translate="no">Олеся Дышекова</span>
         </div>
         <div class="about-depth-arch" aria-hidden="true" data-depth="-0.12"></div>
         <img class="about-depth-figure" src="/static/images/01_24_56-Photoroom.png?v=1" alt="Олеся Дышекова" width="853" height="1280" loading="lazy" decoding="async" data-depth="0.08" />
@@ -95,7 +96,7 @@
         <div class="section-head">
           <div>
             <span class="kicker">Об Инструкторе</span>
-            <h2><span class="about-title-line">Олеся Дышекова — мастер</span><br>и наставник</h2>
+            <h2><span class="about-title-line">Мастер и наставник</span></h2>
           </div>
         </div>
         <p class="about-lead">
@@ -156,7 +157,6 @@
     <div class="overview-layout">
       <div class="section-head">
         <div>
-          <span class="kicker">Почему я</span>
           <h2>Что вы получите после обучения</h2>
         </div>
       </div>
@@ -579,7 +579,6 @@
             <span aria-hidden="true">›</span>
           </button>
           <p class="works-counter" data-works-counter aria-live="polite">1&nbsp;из&nbsp;12</p>
-          <button type="button" class="works-focus-pause" data-works-pause aria-pressed="false">Пауза</button>
         </div>
       </div>
 
@@ -917,37 +916,37 @@
       <details class="faq-item" data-faq="experience">
         <summary>Нужен ли опыт, чтобы начать обучение?</summary>
         <div class="faq-answer">
-          <p>Нет. Есть форматы для новичков с нуля и офлайн-повышение для тех, кто уже работает. На старте разберём ваш уровень и подберём программу.</p>
+          <p>Нет. Есть форматы для новичков с нуля и повышение для тех, кто уже работает. На старте разберём ваш уровень и подберём программу</p>
         </div>
       </details>
       <details class="faq-item" data-faq="format">
-        <summary>Чем отличается онлайн от офлайн?</summary>
+        <summary>Есть ли рассрочка или возможность оплаты частями?</summary>
         <div class="faq-answer">
-          <p>Онлайн — пошаговая программа в записи в своём темпе. Офлайн — живая практика один на один с разбором техники и отработками под контролем.</p>
+          <p>Да. Можно оплатить частями. Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — подберём удобный вариант</p>
         </div>
       </details>
       <details class="faq-item" data-faq="support">
         <summary>Есть ли поддержка после курса?</summary>
         <div class="faq-answer">
-          <p>Да. Можно присылать работы, задавать вопросы и закреплять навык. В обучении заложена обратная связь, чтобы вы не остались один на один с ошибками.</p>
+          <p>Да. Можно присылать работы, задавать вопросы и закреплять навык. В обучении заложена обратная связь на протяжении 3-х месяцев, чтобы вы не остались один на один с ошибками</p>
         </div>
       </details>
       <details class="faq-item" data-faq="duration">
-        <summary>Сколько длится обучение и когда старт?</summary>
+        <summary>Сколько длится обучение?</summary>
         <div class="faq-answer">
-          <p>Срок зависит от формата: онлайн можно проходить в своём ритме, офлайн согласуем даты индивидуально. Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — подберём ближайший старт.</p>
+          <p>Срок зависит от формата обучения: <br> Базовый - 3 дня, <br>Повышение квалификации - 1 день</p>
         </div>
       </details>
       <details class="faq-item" data-faq="result">
         <summary>Что я получу на выходе?</summary>
         <div class="faq-answer">
-          <p>Поставленную технику, понимание чистоты и покрытия, работы для портфолио и понятный сценарий, как выходить к клиентам и расти в чеке.</p>
+          <p>Именной сертификат, портфолио со своими отработками, файл с закупкой инструментов и материалов для маникюра. Скидка 10% на продукцию бренда Milk по промокоду</p>
         </div>
       </details>
       <details class="faq-item" data-faq="signup">
         <summary>Как записаться?</summary>
         <div class="faq-answer">
-          <p>Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — расскажите, какой формат интересен (офлайн / базовый / PRO). Или оставьте имя и телефон в форме ниже, и мы перезвоним.</p>
+          <p>Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — расскажите, какой формат интересен (повышение / базовый)</p>
           <p class="faq-contact-links">
             <a href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс'|urlencode }}" class="faq-link" target="_blank" rel="noopener noreferrer" translate="no">Telegram</a>
             <a href="{{ instagram_url }}" class="faq-link" target="_blank" rel="noopener noreferrer" translate="no">Instagram</a>

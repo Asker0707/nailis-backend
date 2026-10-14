@@ -85,7 +85,6 @@
     const thumbs = Array.from(worksFocus.querySelectorAll("[data-works-thumb]"));
     const focusVideo = worksFocus.querySelector("[data-works-focus-video]");
     const focusImage = worksFocus.querySelector("[data-works-focus-image]");
-    const pauseBtn = worksFocus.querySelector("[data-works-pause]");
     const prevBtn = worksFocus.querySelector("[data-works-prev]");
     const nextBtn = worksFocus.querySelector("[data-works-next]");
     const counterEl = worksFocus.querySelector("[data-works-counter]");
@@ -95,7 +94,6 @@
     let timerId = null;
     let sectionVisible = true;
     let paused = false;
-    let userPaused = false;
     // Пока на телефоне экран блокировки (home-motion.js), работы не листаем.
     // Если анимации не загрузились (нет html.nh-motion), блокировки нет — снимаем флаг.
     let introLocked = !reducedMotion && Boolean(worksFocus.querySelector("[data-works-lock]"));
@@ -130,8 +128,6 @@
         counterEl.textContent = `${activeIndex + 1}\u00A0из\u00A0${thumbs.length}`;
       }
 
-      if (pauseBtn instanceof HTMLButtonElement) pauseBtn.hidden = type !== "video";
-
       if (type === "video" && focusVideo instanceof HTMLVideoElement) {
         if (focusImage instanceof HTMLImageElement) {
           focusImage.hidden = true;
@@ -149,7 +145,7 @@
           focusVideo.removeAttribute("src");
         }
 
-        if (sectionVisible && !document.hidden && !reducedMotion && !userPaused) {
+        if (sectionVisible && !document.hidden && !reducedMotion) {
           playVideo(focusVideo);
         } else {
           ensureSource(focusVideo);
@@ -184,7 +180,7 @@
 
     const startAutoplay = () => {
       stopAutoplay();
-      if (reducedMotion || thumbs.length < 2 || paused || userPaused || introLocked) return;
+      if (reducedMotion || thumbs.length < 2 || paused || introLocked) return;
       timerId = window.setInterval(() => {
         if (!sectionVisible || document.hidden || paused) return;
         showFocus(activeIndex + 1);
@@ -240,23 +236,6 @@
       };
       stage.addEventListener("pointerup", endSwipe);
       stage.addEventListener("pointercancel", () => { swipeId = null; });
-    }
-
-    if (pauseBtn instanceof HTMLButtonElement) {
-      pauseBtn.addEventListener("click", () => {
-        userPaused = !userPaused;
-        pauseBtn.setAttribute("aria-pressed", userPaused ? "true" : "false");
-        pauseBtn.textContent = userPaused ? "Смотреть" : "Пауза";
-        if (userPaused) {
-          stopAutoplay();
-          if (focusVideo instanceof HTMLVideoElement) pauseVideo(focusVideo);
-          return;
-        }
-        if (sectionVisible && !document.hidden) {
-          if (focusVideo instanceof HTMLVideoElement && !focusVideo.hidden) playVideo(focusVideo);
-          startAutoplay();
-        }
-      });
     }
 
     worksFocus.addEventListener("mouseenter", () => {

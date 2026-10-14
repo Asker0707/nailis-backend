@@ -23,18 +23,28 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 12%;
+  padding-top: 4%; /* над головой: имя не должно уходить за фигуру */
   pointer-events: none;
+  container-type: inline-size;
 }
 
 .about-depth-word {
   font-family: "Isadora Cyr", "Lora", cursive;
-  font-size: clamp(5.5rem, 13vw, 11rem);
+  /* имя длинное — размер от ширины портрета, чтобы строка помещалась целиком */
+  font-size: clamp(2.6rem, 6vw, 5.5rem);
+  font-size: 9cqi;
   line-height: 1;
   color: transparent;
   -webkit-text-stroke: 1px rgba(49, 27, 20, 0.28);
   white-space: nowrap;
   user-select: none;
+}
+
+/* узкий портрет (телефон): над аркой больше места относительно ширины */
+@container (max-width: 480px) {
+  .about-depth-word {
+    font-size: 11.5cqi;
+  }
 }
 
 .about-depth-arch {

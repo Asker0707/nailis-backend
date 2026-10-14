@@ -2206,8 +2206,7 @@ body.page-home .final-cta {
 .installment-amount-btn:focus-visible,
 .installment-term:focus-visible,
 .cert-lightbox-close:focus-visible,
-.callback-pop-close:focus-visible,
-.works-focus-pause:focus-visible {
+.callback-pop-close:focus-visible {
   outline: 2px solid #311b14;
   outline-offset: 3px;
 }
@@ -2217,31 +2216,8 @@ body.page-home .final-cta {
   outline-offset: 3px;
 }
 
-.works-focus-pause {
-  position: absolute;
-  z-index: 3;
-  right: 0.75rem;
-  bottom: 0.75rem;
-  min-height: 2.5rem;
-  padding: 0.4rem 0.95rem;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(49, 27, 20, 0.78);
-  color: #ede6d8;
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.works-focus-pause:hover {
-  background: rgba(49, 27, 20, 0.92);
-}
 
-.works-focus-pause[aria-pressed="true"] {
-  background: #ede6d8;
-  color: #311b14;
-}
 
 .callback-field-error {
   margin: 0.15rem 0 0;
@@ -2434,36 +2410,9 @@ body.page-home .final-cta {
   color: rgba(237, 230, 216, 0.58);
 }
 
-.works-section .works-focus-pause {
-  position: static;
-  inset: auto;
-  margin-left: auto;
-  padding: 0.45rem 1rem;
-  font-family: var(--nh-font-body, "Poppins", sans-serif);
-  font-size: 0.8rem;
-  color: #ede6d8;
-  background: transparent;
-  border: 1px solid rgba(237, 230, 216, 0.28);
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
 
-.works-section .works-focus-pause:hover {
-  background: rgba(237, 230, 216, 0.12);
-  border-color: rgba(237, 230, 216, 0.55);
-}
 
-.works-section .works-focus-pause[aria-pressed="true"] {
-  color: #311b14;
-  background: #ede6d8;
-  border-color: #ede6d8;
-}
 
-.works-section .works-focus-pause:focus-visible {
-  outline: 2px solid #ede6d8;
-  outline-offset: 3px;
-}
 
 /* --- Индекс работ --- */
 
@@ -2656,8 +2605,7 @@ body.page-home .final-cta {
 @media (prefers-reduced-motion: reduce) {
   .works-section .works-thumb,
   .works-section .works-focus-stage,
-  .works-nav,
-  .works-section .works-focus-pause {
+  .works-nav {
     transition: none;
   }
 

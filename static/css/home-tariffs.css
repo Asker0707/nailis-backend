@@ -585,7 +585,11 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 1.2rem 0 1.6rem;
+  /* полоса прокрутки уходит в боковой отступ карточки, чтобы не прилипать к пунктам */
+  margin-right: -1rem;
+  padding: 1.2rem 1rem 1.6rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(49, 27, 20, 0.28) transparent;
 }
 
 .tdialog-panel {
@@ -753,12 +757,22 @@
     padding: 0.9rem 1.1rem 0;
   }
 
+  /* вкладки доходят до краёв шторки: последняя уходит за край экрана,
+     а не обрезается по полю, — видно, что ряд листается */
   .tdialog-tabs {
-    margin-right: 0;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem 0.9rem;
+    scroll-padding-inline: 1.1rem;
+  }
+
+  .tdialog-tab {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.84rem;
   }
 
   .tdialog-panels {
-    padding-bottom: 1rem;
+    margin-right: -0.8rem;
+    padding: 1.1rem 0.8rem 1rem 0;
   }
 
   .tdialog-actions {
