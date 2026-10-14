@@ -136,10 +136,22 @@
   font-size: 0.95rem;
 }
 
-.msgr-avatar--0 { background: #c47b5a; }
-.msgr-avatar--1 { background: #8a6a9e; }
-.msgr-avatar--2 { background: #5f8a72; }
-.msgr-avatar--3 { background: #b0894a; }
+/* буквенные аватарки — как знак «N» в шапке (.brand-mark), на тон светлее */
+span.msgr-avatar {
+  color: var(--nh-cream, #ede6d8);
+  font-family: var(--nh-font-display, "Lora", serif);
+  font-weight: 400;
+  background: linear-gradient(135deg, #4a2c21, #7a5747);
+  box-shadow: 0 6px 14px rgba(49, 27, 20, 0.22);
+}
+
+/* на тёмной строке выбранной переписки кружок иначе сливается с фоном
+   (на телефоне строка светлая, там своё кольцо — см. max-width: 760px) */
+@media (min-width: 761px) {
+  .msgr-item[aria-selected="true"] span.msgr-avatar {
+    box-shadow: 0 0 0 1.5px rgba(237, 230, 216, 0.45);
+  }
+}
 
 /* ---------- открытый чат ---------- */
 

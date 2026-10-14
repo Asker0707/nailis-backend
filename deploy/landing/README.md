@@ -151,7 +151,7 @@ SITE_URL=https://example.ru DEPLOY_TARGET=deploy@203.0.113.10 ./deploy/landing/d
 
 - https://example.ru открывается, замок в адресной строке;
 - http:// и www. переадресуют на https://example.ru;
-- https://example.ru/privacy, /offer, несуществующий адрес → своя 404;
+- https://example.ru/privacy, /offer (сейчас временно не публикуются — см. `PAGES` в `build_landing.py`), несуществующий адрес → своя 404;
 - превью ссылки в Telegram (отправьте ссылку себе в «Избранное»);
 - https://securityheaders.com — оценка заголовков.
 

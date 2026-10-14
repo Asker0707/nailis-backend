@@ -1022,16 +1022,8 @@ body.page-home .vertical-watermark {
   color: rgba(49, 27, 20, 0.82);
 }
 
-.about-section-v2 .about-lead.about-lead-soft {
-  margin-bottom: 1.1rem;
-}
-
-.about-lead-soft {
-  color: rgba(49, 27, 20, 0.66) !important;
-}
-
 .about-certs {
-  margin-top: 0.35rem;
+  margin-top: 0.6rem;
   max-width: 46ch;
 }
 
@@ -2151,6 +2143,57 @@ body.page-home .site-navbar {
   padding-top: max(0.85rem, env(safe-area-inset-top));
   padding-right: env(safe-area-inset-right);
   padding-left: env(safe-area-inset-left);
+}
+
+/* Кнопка записи в шапке: страница длинная, записаться можно с любого экрана */
+.navbar-cta {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em; /* вместо пробела: во flex он у края элемента схлопывается */
+  min-height: 2.75rem;
+  margin-left: auto;
+  padding: 0.55rem 1.25rem;
+  border-radius: 999px;
+  background: #311b14;
+  color: #ede6d8;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.navbar-cta:hover,
+.navbar-cta:focus-visible {
+  background: #4a2c21;
+  color: #ede6d8;
+}
+
+.navbar-cta:focus-visible {
+  outline: 2px solid #311b14;
+  outline-offset: 3px;
+}
+
+@media (max-width: 991px) {
+  /* без меню (гость) правый отступ под бургер не нужен */
+  .navbar-shell:not(:has(.navbar-toggler)) {
+    padding-right: 0.7rem;
+  }
+
+  .navbar-cta {
+    min-height: 2.5rem;
+    padding: 0.5rem 1.05rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-cta-tail {
+    display: none;
+  }
 }
 
 body.page-home .hero-bleed,

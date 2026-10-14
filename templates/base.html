@@ -56,6 +56,7 @@
             <span class="brand-name" translate="no">Nailis.hub</span>
           </span>
         </a>
+        {% block navbar_cta %}{% endblock %}
         {% if user %}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Меню">
           <span class="navbar-toggler-icon"></span>
@@ -102,8 +103,10 @@
       </div>
       <div class="footer-links">
         {# временно скрыто: <a href="/courses">Курсы</a> #}
+        {# временно скрыто, пока документы не обновлены под текущий формат записи:
         <a href="/privacy">Политика ПДн</a>
         <a href="/offer">Оферта</a>
+        #}
         <a href="{{ telegram_url|default('https://t.me/Dyshekova_Olesia') }}" target="_blank" rel="noopener">Telegram</a>
         <a href="{{ instagram_url|default('https://www.instagram.com/nailis.hub/') }}" target="_blank" rel="noopener">Instagram</a>
       </div>

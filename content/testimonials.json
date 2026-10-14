@@ -23,6 +23,7 @@
     },
     {
       "name": "Анна",
+      "course": "Junior",
       "original": "/static/images/reviews/anna.webp",
       "original_thumb": "/static/images/reviews/anna-thumb.webp",
       "messages": [
@@ -31,6 +32,7 @@
     },
     {
       "name": "Алена",
+      "course": "Junior",
       "original": "/static/images/reviews/alena.webp",
       "original_thumb": "/static/images/reviews/alena-thumb.webp",
       "messages": [

@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Главная | Nailis.hub{% endblock %}
 {% block body_class %}page-home{% endblock %}
+{% block navbar_cta %}
+<a class="navbar-cta" href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс'|urlencode }}" target="_blank" rel="noopener noreferrer">
+  Записаться<span class="navbar-cta-tail">в&nbsp;<span translate="no">Telegram</span></span>
+</a>
+{% endblock %}
 
 {% block extra_css %}
   <link href="/static/css/index-page.css?v={{ asset_v|default('dev', true) }}" rel="stylesheet" />
@@ -108,7 +113,7 @@
         </p>
 
         <div class="about-certs" data-certs-gallery aria-label="Сертификаты">
-          <p class="about-certs-label">Мои работы</p>
+          <p class="about-certs-label">Часть моих работ</p>
           <div class="about-certs-grid" data-certs-deck>
 
             <button type="button" class="about-cert-item" data-cert-open>
@@ -1022,9 +1027,9 @@
   <script src="/static/vendor/lenis.min.js" defer></script>
   <script src="/static/js/home-motion.js?v={{ asset_v|default('dev', true) }}" defer></script>
   {% if dev_live_reload %}
-  <script>
+  <script data-asset-v="{{ asset_v|default('0', true) }}">
     (function () {
-      var last = {{ asset_v|default('0', true)|tojson }};
+      var last = document.currentScript.getAttribute("data-asset-v");
       async function tick() {
         try {
           var res = await fetch("/__dev__/reload-version", { cache: "no-store" });
