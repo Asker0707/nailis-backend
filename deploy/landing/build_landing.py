@@ -63,7 +63,7 @@ def asset_version() -> str:
     return digest.hexdigest()[:10]
 
 
-def render_pages(site_url: str, version: str) -> dict[str, str]:
+def render_pages(site_url: str, version: str, noindex: bool = False) -> dict[str, str]:
     env = Environment(
         loader=FileSystemLoader(str(ROOT / "templates")),
         autoescape=select_autoescape(["html", "xml"]),
@@ -75,6 +75,7 @@ def render_pages(site_url: str, version: str) -> dict[str, str]:
         "request": SimpleNamespace(url=SimpleNamespace(path="/")),
         "user": None,
         "static_site": True,
+        "noindex": noindex,
         "site_url": site_url,
         "asset_v": version,
         "dev_live_reload": False,
@@ -121,7 +122,7 @@ def with_base_path(html: str, base: str) -> str:
     return ROOT_ATTR.sub(lambda m: f"{m.group(1)}{base}/", html) if base else html
 
 
-def write_extras(out: Path, site_url: str) -> None:
+def write_extras(out: Path, site_url: str, noindex: bool = False) -> None:
     today = date.today().isoformat()
     urls = "".join(
         f"  <url><loc>{site_url}{path}</loc><lastmod>{today}</lastmod></url>\n"
@@ -133,7 +134,9 @@ def write_extras(out: Path, site_url: str) -> None:
         encoding="utf-8",
     )
     (out / "robots.txt").write_text(
-        f"User-agent: *\nAllow: /\n\nSitemap: {site_url}/sitemap.xml\n", encoding="utf-8"
+        "User-agent: *\nDisallow: /\n" if noindex
+        else f"User-agent: *\nAllow: /\n\nSitemap: {site_url}/sitemap.xml\n",
+        encoding="utf-8",
     )
     shutil.copy2(STATIC / "images" / "icons" / "favicon-32.png", out / "favicon.png")
 
@@ -145,6 +148,7 @@ def main() -> int:
     parser.add_argument("--base-path", default="", help="подпапка сайта, например /nailis для <user>.github.io/nailis")
     parser.add_argument("--github-pages", action="store_true", help="добавить .nojekyll (и CNAME при --cname)")
     parser.add_argument("--cname", default="", help="свой домен для GitHub Pages, например nailis.ru")
+    parser.add_argument("--noindex", action="store_true", help="тестовая копия: запретить поисковикам индексировать")
     args = parser.parse_args()
 
     site_url = args.site_url.rstrip("/")
@@ -161,7 +165,7 @@ def main() -> int:
     out.mkdir(parents=True)
 
     version = asset_version()
-    rendered = render_pages(site_url, version)
+    rendered = render_pages(site_url, version, noindex=args.noindex)
     for template, page_path in PAGES.items():
         target = out / "404.html" if page_path is None else out / page_path.strip("/") / "index.html"
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -179,7 +183,7 @@ def main() -> int:
         else:
             shutil.copy2(src, dst)
         total += src.stat().st_size
-    write_extras(out, site_url)
+    write_extras(out, site_url, noindex=args.noindex)
     if args.github_pages:
         (out / ".nojekyll").write_text("", encoding="utf-8")  # не прогонять сайт через Jekyll
         if args.cname:
@@ -187,6 +191,8 @@ def main() -> int:
 
     print(f"Страниц: {len(PAGES)}, файлов из static: {len(assets)}, вес: {total / 1024 / 1024:.1f} МБ")
     print(f"Версия CSS/JS: {version}")
+    if args.noindex:
+        print("Индексация запрещена (noindex) — тестовая копия")
     print(f"Готово: {out}")
     if missing:
         print("\nНЕ НАЙДЕНЫ (страница на них ссылается):", file=sys.stderr)

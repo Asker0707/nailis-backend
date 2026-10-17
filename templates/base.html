@@ -8,6 +8,7 @@
   {% endif %}
   <title>{% block title %}Nailis.hub — обучение маникюру{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {% if noindex %}<meta name="robots" content="noindex, nofollow" />{% endif %}
   <meta name="description" content="{% block meta_description %}Онлайн и очное обучение маникюру: курсы, уроки, практика и кабинет студента на Nailis.hub.{% endblock %}" />
   <meta name="keywords" content="маникюр, онлайн обучение, курсы, уроки, nail art, Nailis.hub" />
   <meta name="theme-color" content="#311B14" />

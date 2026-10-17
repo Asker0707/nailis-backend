@@ -50,7 +50,7 @@ docker compose --profile monitoring up   # adds prometheus + grafana
 ## Notes
 
 - `.cursor/skills/` contains design skills (frontend-design, scroll-craft, web-design-guidelines) used for the landing-page redesign; `scrollcraft/` and `design-baseline/` are related working dirs.
-- The working tree is mid-refactor with many uncommitted changes and deletions; check `git status` before assuming a file exists.
+- The callback form is switched off everywhere (`show_callback = false` in `templates/index.html`), and the privacy/offer pages are hidden from the footer and excluded from the static build until the owner provides legal details.
 
 # Автоматическое использование скиллов
 
@@ -98,3 +98,14 @@ docker compose --profile monitoring up   # adds prometheus + grafana
 ## Publishing the landing page
 
 `deploy/landing/` builds the home page (+ privacy, offer, 404) into a fully static site in `dist/landing/` (`build_landing.py`, run inside the `web` container) and ships it with nginx (`deploy/landing/nginx/`, `deploy.sh`, step-by-step `README.md`). The build renders templates with `static_site=True`, which hides the callback form (needs `/api/callback`) and app-only scripts; keep new landing features working without a backend or wrap server-dependent parts in `{% if not static_site %}`. Only files referenced from the rendered HTML/CSS are copied, so new assets must be referenced as `/static/...`. External CDNs are not allowed by the nginx CSP — vendor libraries and fonts live in `static/vendor/`.
+
+**Release flow (owner's rule): staging first, production only after the owner approves.**
+
+1. Commit and push to `master`.
+2. Staging — GitHub Pages, built with `--noindex` (robots `noindex` + `Disallow: /`), so search engines ignore it:
+   `GH_REPO=git@github.com:Asker0707/nailis-backend.git SITE_URL=https://asker0707.github.io/nailis-backend BRANCH=gh-pages ./deploy/landing/publish_github.sh`
+3. The owner checks https://asker0707.github.io/nailis-backend/ and says it's OK.
+4. Production — own VDS, https://olesia-nails.ru (nginx + Let's Encrypt, user `deploy`):
+   `SITE_URL=https://olesia-nails.ru DEPLOY_TARGET=deploy@<server-ip> ./deploy/landing/deploy.sh`
+
+Never deploy to production without the owner's go-ahead on staging.

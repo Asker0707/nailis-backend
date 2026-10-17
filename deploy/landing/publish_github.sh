@@ -21,9 +21,13 @@ cd "$(dirname "$0")/../.."
 : "${SITE_URL:?Укажите SITE_URL, например https://USER.github.io/nailis-site}"
 BRANCH="${BRANCH:-gh-pages}"
 CNAME="${CNAME:-}"
+# GitHub Pages сейчас — тестовая копия (боевой сайт на своём сервере): поисковикам её не показываем.
+# INDEX=1 — если когда-нибудь публиковать сюда основной сайт.
+INDEX="${INDEX:-}"
 
 SITE_URL="${SITE_URL%/}"
 args=(--site-url "$SITE_URL" --github-pages --out dist/github-pages)
+[[ -n "$INDEX" ]] || args+=(--noindex)
 if [[ -n "$CNAME" ]]; then
   args+=(--cname "$CNAME")
 else
