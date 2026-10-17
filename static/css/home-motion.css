@@ -1,0 +1,584 @@
+/*
+ * Слой анимаций главной (GSAP + ScrollTrigger + Lenis).
+ * Всё, что прячет контент до анимации, включается только под html.nh-motion —
+ * класс ставит home-motion.js после загрузки GSAP. Без JS страница остаётся статичной.
+ */
+
+/* ---------- Об инструкторе: портрет в три слоя ---------- */
+
+.about-section-v2 .about-portrait.about-portrait--layered {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: linear-gradient(180deg, rgba(255, 252, 248, 0.6), rgba(226, 213, 194, 0.55));
+}
+
+.about-depth-back {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4%; /* над головой: имя не должно уходить за фигуру */
+  pointer-events: none;
+  container-type: inline-size;
+}
+
+.about-depth-word {
+  font-family: "Isadora Cyr", "Lora", cursive;
+  /* имя длинное — размер от ширины портрета, чтобы строка помещалась целиком */
+  font-size: clamp(2.6rem, 6vw, 5.5rem);
+  font-size: 9cqi;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(49, 27, 20, 0.28);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* узкий портрет (телефон): над аркой больше места относительно ширины */
+@container (max-width: 480px) {
+  .about-depth-word {
+    font-size: 11.5cqi;
+  }
+}
+
+.about-depth-arch {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  width: 74%;
+  height: 78%;
+  transform: translateX(-50%);
+  border-radius: 999px 999px 0 0;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(120, 52, 40, 0.55), rgba(120, 52, 40, 0) 70%),
+    linear-gradient(180deg, #5b2a20 0%, #311b14 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.about-section-v2 .about-portrait--layered .about-depth-figure {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 94%;
+  min-height: 0;
+  object-fit: contain;
+  object-position: center bottom;
+  transform: none;
+  transition: none;
+  filter: drop-shadow(0 24px 30px rgba(49, 27, 20, 0.28));
+}
+
+/* Мини-галерея работ: колода с перспективой */
+.about-certs-grid[data-certs-deck] {
+  perspective: 900px;
+}
+
+.about-certs-grid[data-certs-deck] .about-cert-item {
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+}
+
+/* ---------- Что вы получите: компактный список ---------- */
+
+.home-shell-v2 > .overview-section.overview-compact {
+  min-height: 0;
+  padding-top: clamp(2.2rem, 4.5vw, 3.6rem);
+  padding-bottom: clamp(2.2rem, 4.5vw, 3.6rem);
+}
+
+.overview-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
+  gap: clamp(1.6rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.overview-layout .section-head {
+  margin: 0;
+}
+
+.benefit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.benefit {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.9rem minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: start;
+  padding: 1.15rem 0;
+}
+
+.benefit-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(49, 27, 20, 0.2);
+  transform-origin: 0 50%;
+}
+
+.benefit-rule--end {
+  top: auto;
+  bottom: 0;
+}
+
+.benefit-icon {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 50%;
+  background: #311b14;
+  color: #ede6d8;
+  transition: background-color 0.3s ease;
+}
+
+/* ховер крутит саму иконку: transform кружка анимирует GSAP */
+.benefit-icon svg {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.benefit:hover .benefit-icon {
+  background: #5b2a20;
+}
+
+.benefit:hover .benefit-icon svg {
+  transform: rotate(-10deg) scale(1.12);
+}
+
+.benefit-copy h3 {
+  margin: 0.15rem 0 0.3rem;
+  font-family: "Isadora Cyr", "Lora", cursive;
+  font-weight: 400;
+  font-size: clamp(1.45rem, 2.1vw, 1.8rem);
+  line-height: 1.1;
+  color: #311b14;
+}
+
+.benefit-copy p {
+  margin: 0;
+  max-width: 46ch;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(49, 27, 20, 0.72);
+}
+
+@media (max-width: 899px) {
+  .overview-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* ---------- Результаты: телефон с экраном блокировки ---------- */
+
+/* Перспективу для перелистывания задаёт сама анимация (transformPerspective в
+   home-motion.js). perspective на .works-stage-col не ставить: с ней Chrome на узком
+   экране не попадает касанием в экран телефона, и свайп по видео не работает. */
+
+.works-focus-stage {
+  transform-style: preserve-3d;
+}
+
+.works-ig-card.works-phone {
+  position: relative;
+  /* Телефон целиком помещается под шапкой сайта: высота карточки ≈ 2.07 × ширина
+     (рамка IG сверху/снизу + видео 9:16), 140px — шапка и отступы. Иначе
+     «телефон открыт полностью» (момент разблокировки) не наступает. */
+  width: min(100%, calc((100vh - 140px) / 2.07));
+  width: min(100%, calc((100svh - 140px) / 2.07));
+  border-radius: 2.4rem;
+  border: 0;
+  box-shadow:
+    0 0 0 9px #1c110e,
+    0 0 0 10px rgba(237, 230, 216, 0.18),
+    0 34px 70px rgba(0, 0, 0, 0.45);
+}
+
+.works-phone-island {
+  position: absolute;
+  z-index: 6;
+  top: 9px;
+  left: 50%;
+  width: 28%;
+  height: 22px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #050302;
+  pointer-events: none;
+}
+
+/* Без JS-анимаций экран блокировки не показываем — работы видны сразу */
+.works-lock {
+  display: none;
+}
+
+html.nh-motion .works-lock {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  border-radius: inherit;
+  background: #241310;
+  will-change: transform;
+}
+
+.works-lock.is-unlocked {
+  pointer-events: none;
+}
+
+.works-lock-wallpaper {
+  position: absolute;
+  inset: -6%;
+  width: 112%;
+  height: 112%;
+  object-fit: cover;
+  filter: blur(14px) saturate(1.1) brightness(0.62);
+  transform: scale(1.04);
+}
+
+.works-lock-surface {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 3.4rem 1rem 0.8rem;
+  border: 0;
+  background: linear-gradient(180deg, rgba(20, 10, 8, 0.15) 0%, rgba(20, 10, 8, 0) 40%, rgba(20, 10, 8, 0.45) 100%);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+
+.works-lock-surface:focus-visible {
+  outline: 2px solid #ede6d8;
+  outline-offset: -6px;
+}
+
+.works-lock-icon {
+  display: inline-flex;
+  margin-bottom: 0.6rem;
+  opacity: 0.92;
+}
+
+.works-lock-icon svg path {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: 17px 11px;
+}
+
+.works-lock.is-unlocked .works-lock-icon svg path {
+  /* дужка замка откидывается, как на iPhone */
+  transform: translate(5px, -2px) rotate(32deg);
+}
+
+.works-lock-date {
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  opacity: 0.9;
+}
+
+.works-lock-date::first-letter {
+  text-transform: uppercase;
+}
+
+.works-lock-time {
+  margin-top: -0.1rem;
+  font-size: clamp(4rem, 8vw, 5.2rem);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.works-lock-note {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 1.1rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  text-align: left;
+}
+
+.works-lock-app {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 0.6rem;
+  background: #ede6d8;
+  color: #311b14;
+  font-family: "Lora", serif;
+  font-weight: 700;
+}
+
+.works-lock-note-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.works-lock-note-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+}
+
+.works-lock-note-head span {
+  opacity: 0.7;
+}
+
+.works-lock-hint {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.works-lock-bar {
+  width: 36%;
+  height: 5px;
+  margin-top: 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- FAQ: фото рядом + плавное раскрытие ---------- */
+
+.faq-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+.home-shell-v2 > .faq-section {
+  overflow: clip;
+}
+
+.faq-visual {
+  position: sticky;
+  top: 110px;
+}
+
+.faq-visual-frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border-radius: 999px 999px 0 0;
+  background: #311b14;
+}
+
+.faq-visual-frame img {
+  width: 100%;
+  height: 118%;
+  object-fit: cover;
+  display: block;
+  will-change: transform;
+}
+
+.faq-item .faq-answer {
+  overflow: hidden;
+}
+
+@media (max-width: 899px) {
+  .faq-layout {
+    display: block;
+  }
+
+  .faq-visual {
+    display: none;
+  }
+}
+
+/* ---------- Финал: окно, которое раскрывается ---------- */
+
+
+
+[data-split-chars] .nh-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+[data-split-chars] .nh-char {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ---------- Заголовки секций ---------- */
+
+html.nh-motion .home-shell-v2 > .home-section .section-head h2 {
+  will-change: clip-path, transform;
+}
+
+/* ---------- Бегущая строка реагирует на скорость скролла ---------- */
+
+.home-marquee-track {
+  will-change: transform;
+}
+
+
+/* body с overflow-x: hidden становится scroll-контейнером и ломает position: sticky */
+html.nh-motion,
+html.nh-motion body.page-home {
+  overflow-x: clip;
+}
+
+/* Поле-ловушка для ботов в формах заявки: людям не видно, скринридеры его не читают */
+.callback-hp {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ---------- Финал: живой кот ----------
+   Два слоя одной геометрии (1920×1080): фон без кота и кот с прозрачными краями.
+   Кот стоит на ≈76% ширины кадра — туда же сдвинуто кадрирование. */
+
+.cta-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* без will-change: Chrome растрирует такой слой один раз (в начальном масштабе
+     анимации ×1.35) и дальше не перерисовывает — кот выглядел мыльным */
+}
+
+/* Под текстом слева — плотное затемнение, на коте справа — лёгкое */
+.final-cta .final-cta-veil {
+  background: linear-gradient(
+    90deg,
+    rgba(49, 27, 20, 0.9) 0%,
+    rgba(49, 27, 20, 0.74) 36%,
+    rgba(49, 27, 20, 0.18) 64%,
+    rgba(49, 27, 20, 0.06) 100%
+  );
+}
+
+@media (max-width: 899px) {
+  /* на телефоне форма лежит поверх кота — затемнение ровное */
+  .final-cta .final-cta-veil {
+    background: rgba(49, 27, 20, 0.72);
+  }
+}
+
+.cta-scene img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% 50%;
+}
+
+/* Оба слоя плывут вместе — одной transform-анимацией обёртки. Раньше фон
+   двигался через translate в %, а кот через transform: в Firefox эти анимации
+   шли в разных потоках и кот подёргивался относительно фона. */
+.cta-drift {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0.8%, 0, 0) scale(1.06);
+  animation: ctaSky 26s ease-in-out infinite alternate;
+  backface-visibility: hidden;
+}
+
+.cta-scene-cat {
+  transform-origin: 76.5% 92%;
+  animation: ctaCatIdle 5.6s ease-in-out infinite;
+  backface-visibility: hidden;
+}
+
+@keyframes ctaSky {
+  from { transform: translate3d(0.8%, 0, 0) scale(1.06); }
+  to { transform: translate3d(-1.2%, -0.4%, 0) scale(1.06); }
+}
+
+/* Firefox округляет медленные смещения до целых пикселей — кот и фон двигались
+   рывками. Отдельный GPU-слой (will-change) включает субпиксельное движение.
+   Только для Firefox: в Chrome will-change под масштабируемой сценой мылит картинку. */
+@supports (-moz-appearance: none) {
+  .cta-drift,
+  .cta-scene-cat {
+    will-change: transform;
+  }
+}
+
+/* «Дыхание» и лёгкое покачивание с мечом — вокруг лап */
+@keyframes ctaCatIdle {
+  0%, 100% { transform: rotate(-0.4deg) scale(1, 1); }
+  50% { transform: rotate(0.4deg) scale(1.003, 1.012); }
+}
+
+/* Пыльца над полем */
+.cta-motes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cta-mote {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 236, 196, 0.9);
+  box-shadow: 0 0 8px 2px rgba(255, 220, 160, 0.55);
+  opacity: 0;
+  animation: ctaMote var(--t) ease-in-out var(--d) infinite;
+}
+
+@keyframes ctaMote {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  20% { opacity: 0.9; }
+  80% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate3d(28px, -110px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-drift,
+  .cta-scene-cat,
+  .cta-mote {
+    animation: none;
+  }
+
+  .cta-mote {
+    display: none;
+  }
+}
+
+/* после разблокировки слой убирается атрибутом hidden — он должен перебить display: block */
+html.nh-motion .works-lock[hidden] {
+  display: none;
+}
