@@ -24,11 +24,18 @@ def _lenta_dir() -> Path:
     return Path(settings.BASE_DIR) / "static" / "videos" / LENTA_DIRNAME
 
 
+AV1_SUFFIX = "_tape_av1.mp4"
+
+
 def _clip_item(directory: Path, stem: str, video_name: str) -> dict[str, str] | None:
     video = directory / video_name
     if not video.is_file():
         return None
     item = {"src": f"/static/videos/{LENTA_DIRNAME}/{video_name}"}
+    # AV1-версия (вдвое легче) — браузер берёт её, если умеет плавно играть (index-page.js)
+    av1 = directory / f"{stem}{AV1_SUFFIX}"
+    if av1.is_file():
+        item["src_av1"] = f"/static/videos/{LENTA_DIRNAME}/{av1.name}"
     poster = directory / f"{stem}_poster.jpg"
     if poster.is_file():
         item["poster"] = f"/static/videos/{LENTA_DIRNAME}/{poster.name}"
@@ -38,7 +45,7 @@ def _clip_item(directory: Path, stem: str, video_name: str) -> dict[str, str] | 
 def list_lenta_clips() -> list[dict[str, str]]:
     """
     Возвращает клипы для hero-ленты в фиксированном порядке.
-    Предпочитает лёгкие *_tape.mp4 + *_poster.jpg;
+    Предпочитает лёгкие *_tape.mp4 (+ *_tape_av1.mp4) + *_poster.jpg;
     если tape нет — берёт исходный файл из папки.
     """
     directory = _lenta_dir()
@@ -75,7 +82,7 @@ def list_lenta_clips() -> list[dict[str, str]]:
             continue
         if path.suffix.lower() not in VIDEO_EXTS:
             continue
-        if path.name.endswith("_tape.mp4"):
+        if path.name.endswith(("_tape.mp4", AV1_SUFFIX)):
             continue
         stem = path.stem
         if stem in used_stems:

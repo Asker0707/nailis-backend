@@ -13,8 +13,31 @@
 (() => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // AV1 при том же качестве примерно вдвое легче H.264. Берём его, только если браузер
+  // играет его плавно, а на телефоне — ещё и аппаратно (иначе греется и садит батарею).
+  let preferAv1 = false;
+  const av1Check = (async () => {
+    try {
+      if (!navigator.mediaCapabilities?.decodingInfo) return false;
+      const info = await navigator.mediaCapabilities.decodingInfo({
+        type: "file",
+        video: {
+          contentType: 'video/mp4; codecs="av01.0.08M.08"',
+          width: 720,
+          height: 1280,
+          bitrate: 1200000,
+          framerate: 60,
+        },
+      });
+      const touchDevice = window.matchMedia("(pointer: coarse)").matches;
+      return info.supported && info.smooth && (info.powerEfficient || !touchDevice);
+    } catch (_) {
+      return false;
+    }
+  })();
+
   const ensureSource = (video) => {
-    const src = video.dataset.src;
+    const src = (preferAv1 && video.dataset.srcAv1) || video.dataset.src;
     if (!src || video.dataset.loaded === "1") return;
     video.src = src;
     video.dataset.loaded = "1";
@@ -59,24 +82,47 @@
     videos.forEach((video) => observer.observe(video));
   };
 
-  // Hero tape: keep all 6 clips playing while the hero is on screen
+  // Лента на первом экране едет по кругу. Ролик грузим и запускаем, когда он
+  // подъезжает к экрану (с запасом в 60% ширины по бокам), а не все сразу:
+  // на телефоне видно полтора ролика из шести.
   const heroTape = document.querySelector("[data-hero-tape]");
   if (heroTape) {
     const heroVideos = Array.from(heroTape.querySelectorAll("video.hero-tape-video"));
-    const playAllHero = () => heroVideos.forEach(playVideo);
-    const pauseAllHero = () => heroVideos.forEach(pauseVideo);
 
-    if (!("IntersectionObserver" in window)) {
-      playAllHero();
-    } else {
+    const startHeroTape = () => {
+      if (!("IntersectionObserver" in window)) {
+        heroVideos.forEach(playVideo);
+        return;
+      }
+      const nearScreen = new Set();
+      let tapeOnScreen = false;
+      const sync = (video) => {
+        if (tapeOnScreen && nearScreen.has(video)) playVideo(video);
+        else pauseVideo(video);
+      };
+      // root — сама лента: её предки обрезают всё за краем экрана, и с корнем-окном
+      // запас по бокам не сработал бы
+      const clipObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) nearScreen.add(entry.target);
+          else nearScreen.delete(entry.target);
+          sync(entry.target);
+        });
+      }, { root: heroTape, rootMargin: "0px 60% 0px 60%" });
       const tapeObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) playAllHero();
-          else pauseAllHero();
+          tapeOnScreen = entry.isIntersecting;
+          heroVideos.forEach(sync);
         });
       }, { threshold: 0.05 });
+      heroVideos.forEach((video) => clipObserver.observe(video));
       tapeObserver.observe(heroTape);
-    }
+    };
+
+    av1Check.then((ok) => {
+      preferAv1 = ok;
+      startHeroTape();
+    });
   }
 
   // Works focus gallery
@@ -92,7 +138,9 @@
     const stage = worksFocus.querySelector(".works-focus-stage");
     let activeIndex = Math.max(0, thumbs.findIndex((thumb) => thumb.classList.contains("is-active")));
     let timerId = null;
-    let sectionVisible = true;
+    // Пока наблюдатель не сказал, что галерея на экране, считаем её невидимой:
+    // иначе её первый ролик качается сразу при открытии страницы, хотя блок далеко внизу.
+    let sectionVisible = !("IntersectionObserver" in window);
     let paused = false;
     // Пока на телефоне экран блокировки (home-motion.js), работы не листаем.
     // Если анимации не загрузились (нет html.nh-motion), блокировки нет — снимаем флаг.
@@ -148,7 +196,7 @@
         if (sectionVisible && !document.hidden && !reducedMotion) {
           playVideo(focusVideo);
         } else {
-          ensureSource(focusVideo);
+          if (sectionVisible) ensureSource(focusVideo);
           pauseVideo(focusVideo);
         }
       } else if (focusImage instanceof HTMLImageElement) {
@@ -312,7 +360,9 @@
       videos.forEach((video) => {
         if (video.getBoundingClientRect().width > 0) {
           const rect = video.getBoundingClientRect();
-          const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+          // и по горизонтали: ролики ленты стоят в ряд, за краем экрана их не грузим
+          const visible = rect.bottom > 0 && rect.top < window.innerHeight
+            && rect.right > 0 && rect.left < window.innerWidth;
           if (visible) playVideo(video);
         }
       });

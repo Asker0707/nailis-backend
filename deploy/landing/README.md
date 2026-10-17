@@ -221,6 +221,7 @@ GH_REPO=git@github.com:USER/nailis-site.git SITE_URL=https://nailis.ru CNAME=nai
 | Отзывы | `content/testimonials.json` (+ скриншоты в `static/images/reviews/`) |
 | Политика, оферта | `templates/legal/privacy.html`, `templates/legal/offer.html` |
 | Ссылки Telegram / Instagram | `services/course_access.py` |
+| Ролики ленты на первом экране | `static/videos/lenta/`: новый ролик — `docker compose exec web sh deploy/landing/encode_clip.sh ИСХОДНИК static/videos/lenta/имя` (H.264 + AV1 + постер) |
 
 После правок — снова `deploy.sh` (или `publish_github.sh`).
 

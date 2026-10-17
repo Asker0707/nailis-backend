@@ -17,15 +17,19 @@ design-baseline/
 dist/
 
 # Видео уроков и исходники роликов: большие (GitHub не принимает > 100 МБ) и платный контент.
-# Ролики главной остаются: static/videos/hero/*, static/videos/lenta/*_tape.mp4, постеры.
+# Ролики главной остаются: static/videos/hero/*, static/videos/lenta/*_tape.mp4 и *_tape_av1.mp4, постеры.
 static/videos/*.mp4
 static/videos/*.MP4
 static/videos/*.mov
 static/videos/*.MOV
 static/videos/lenta/*.mp4
 !static/videos/lenta/*_tape.mp4
+!static/videos/lenta/*_tape_av1.mp4
 static/images/result_students/*.mov
 static/images/result_students/*.MOV
 # локальные служебные файлы
 .local/
 exports/
+
+# резервные копии роликов (тяжёлые, в git не нужны)
+backups/**/*.mp4

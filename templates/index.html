@@ -57,6 +57,7 @@
                 preload="none"
                 {% if clip.poster %}poster="{{ clip.poster }}"{% endif %}
                 data-src="{{ clip.src }}"
+                {% if clip.src_av1 %}data-src-av1="{{ clip.src_av1 }}"{% endif %}
               ></video>
             </div>
             {% endfor %}
@@ -95,7 +96,7 @@
           <span class="about-depth-word" translate="no">Олеся Дышекова</span>
         </div>
         <div class="about-depth-arch" aria-hidden="true" data-depth="-0.12"></div>
-        <img class="about-depth-figure" src="/static/images/01_24_56-Photoroom.png?v=1" alt="Олеся Дышекова" width="853" height="1280" loading="lazy" decoding="async" data-depth="0.08" />
+        <img class="about-depth-figure" src="/static/images/01_24_56-Photoroom.webp" alt="Олеся Дышекова" width="853" height="1280" loading="lazy" decoding="async" data-depth="0.08" />
       </div>
       <div class="about-copy">
         <div class="section-head">
