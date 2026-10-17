@@ -187,9 +187,9 @@
 
 /* ---------- Результаты: телефон с экраном блокировки ---------- */
 
-.works-stage-col {
-  perspective: 1400px; /* для перелистывания работ */
-}
+/* Перспективу для перелистывания задаёт сама анимация (transformPerspective в
+   home-motion.js). perspective на .works-stage-col не ставить: с ней Chrome на узком
+   экране не попадает касанием в экран телефона, и свайп по видео не работает. */
 
 .works-focus-stage {
   transform-style: preserve-3d;

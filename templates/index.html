@@ -571,20 +571,16 @@
               height="1920"
               loading="lazy"
               decoding="async"
+              draggable="false"
               hidden
             />
+            {# Подсказка про свайп; прячется после первого перелистывания (index-page.js).
+               Для экранных дикторов не нужна: работы выбираются миниатюрами ниже. #}
+            <span class="works-swipe-hint" data-works-swipe-hint aria-hidden="true">
+              <span class="works-swipe-arrow">‹</span>Листайте<span class="works-swipe-arrow">›</span>
+            </span>
           </div>
           <div class="works-ig-bottom" aria-hidden="true"></div>
-        </div>
-
-        <div class="works-controls">
-          <button type="button" class="works-nav" data-works-prev aria-label="Предыдущая работа">
-            <span aria-hidden="true">‹</span>
-          </button>
-          <button type="button" class="works-nav" data-works-next aria-label="Следующая работа">
-            <span aria-hidden="true">›</span>
-          </button>
-          <p class="works-counter" data-works-counter aria-live="polite">1&nbsp;из&nbsp;12</p>
         </div>
       </div>
 

@@ -2407,55 +2407,59 @@ body.page-home .final-cta {
   border-radius: 0;
 }
 
-/* --- Управление просмотром --- */
+/* --- Подсказка «Листайте» поверх экрана телефона --- */
 
-.works-controls {
-  display: flex;
+.works-section .works-focus-stage {
+  cursor: grab;
+  user-select: none;
+}
+
+.works-swipe-hint {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 1rem;
+  display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  width: 100%;
-  max-width: 400px;
-  margin-top: 0.9rem;
-  padding: 0;
-}
-
-.works-nav {
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  font-size: 1.45rem;
-  line-height: 1;
-  color: #ede6d8;
-  background: transparent;
-  border: 1px solid rgba(237, 230, 216, 0.28);
+  gap: 0.55rem;
+  padding: 0.45rem 0.95rem;
   border-radius: 999px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.works-nav:hover {
-  background: rgba(237, 230, 216, 0.12);
-  border-color: rgba(237, 230, 216, 0.55);
-}
-
-.works-nav:focus-visible {
-  outline: 2px solid #ede6d8;
-  outline-offset: 3px;
-}
-
-.works-counter {
-  margin: 0 0 0 0.3rem;
+  background: rgba(20, 10, 8, 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #ede6d8;
   font-family: var(--nh-font-body, "Poppins", sans-serif);
-  font-size: 0.85rem;
-  font-variant-numeric: tabular-nums;
-  color: rgba(237, 230, 216, 0.58);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 0.4s ease;
 }
 
+.works-swipe-hint.is-hidden {
+  opacity: 0;
+}
 
+.works-swipe-arrow {
+  font-size: 1.1rem;
+  animation: worksSwipeNudgeLeft 1.6s ease-in-out infinite;
+}
 
+.works-swipe-arrow:last-child {
+  animation-name: worksSwipeNudgeRight;
+}
 
+@keyframes worksSwipeNudgeLeft {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-3px); }
+}
+
+@keyframes worksSwipeNudgeRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
 
 /* --- Индекс работ --- */
 
@@ -2587,8 +2591,7 @@ body.page-home .final-cta {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .works-stage-col,
-  .works-controls {
+  .works-stage-col {
     width: 100%;
     max-width: 340px;
     margin-inline: auto;
@@ -2596,10 +2599,6 @@ body.page-home .final-cta {
 
   .works-section .works-focus-stage {
     max-width: none;
-  }
-
-  .works-controls {
-    justify-content: flex-start;
   }
 
   .works-index {
@@ -2647,9 +2646,12 @@ body.page-home .final-cta {
 
 @media (prefers-reduced-motion: reduce) {
   .works-section .works-thumb,
-  .works-section .works-focus-stage,
-  .works-nav {
+  .works-section .works-focus-stage {
     transition: none;
+  }
+
+  .works-swipe-arrow {
+    animation: none;
   }
 
   .works-section .works-thumb:focus-visible {

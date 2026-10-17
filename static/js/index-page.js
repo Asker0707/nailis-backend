@@ -131,9 +131,7 @@
     const thumbs = Array.from(worksFocus.querySelectorAll("[data-works-thumb]"));
     const focusVideo = worksFocus.querySelector("[data-works-focus-video]");
     const focusImage = worksFocus.querySelector("[data-works-focus-image]");
-    const prevBtn = worksFocus.querySelector("[data-works-prev]");
-    const nextBtn = worksFocus.querySelector("[data-works-next]");
-    const counterEl = worksFocus.querySelector("[data-works-counter]");
+    const swipeHint = worksFocus.querySelector("[data-works-swipe-hint]");
     const indexList = worksFocus.querySelector("[data-works-thumbs]");
     const stage = worksFocus.querySelector(".works-focus-stage");
     let activeIndex = Math.max(0, thumbs.findIndex((thumb) => thumb.classList.contains("is-active")));
@@ -171,9 +169,10 @@
         item.classList.toggle("is-active", on);
         item.setAttribute("aria-pressed", on ? "true" : "false");
       });
-      if (fromUser) writeParam("work", activeIndex + 1);
-      if (counterEl instanceof HTMLElement) {
-        counterEl.textContent = `${activeIndex + 1}\u00A0из\u00A0${thumbs.length}`;
+      if (fromUser) {
+        writeParam("work", activeIndex + 1);
+        // человек уже листает — подсказка больше не нужна
+        swipeHint?.classList.add("is-hidden");
       }
 
       if (type === "video" && focusVideo instanceof HTMLVideoElement) {
@@ -244,13 +243,12 @@
     });
 
     const step = (delta) => {
+      worksFocus.dispatchEvent(new CustomEvent("nh:works-step", { detail: { direction: delta } }));
       showFocus(activeIndex + delta, { fromUser: true });
       stopAutoplay();
       startAutoplay();
     };
 
-    if (prevBtn instanceof HTMLButtonElement) prevBtn.addEventListener("click", () => step(-1));
-    if (nextBtn instanceof HTMLButtonElement) nextBtn.addEventListener("click", () => step(1));
 
     if (indexList instanceof HTMLElement) {
       indexList.addEventListener("keydown", (event) => {

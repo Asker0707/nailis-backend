@@ -262,8 +262,8 @@
       };
 
       surface?.addEventListener("click", () => unlock({ pause: false }));
-      // выбрали работу в списке или стрелкой, пока экран заблокирован, — открываем
-      gallery?.querySelectorAll("[data-works-thumb], [data-works-prev], [data-works-next]").forEach((control) => {
+      // выбрали работу в списке, пока экран заблокирован, — открываем
+      gallery?.querySelectorAll("[data-works-thumb]").forEach((control) => {
         control.addEventListener("click", () => unlock({ pause: false }));
       });
 
@@ -291,8 +291,10 @@
         { rotateY: 0, autoAlpha: 1, duration: 0.7, ease: "power3.out", clearProps: "transform" },
       );
     };
-    document.querySelector("[data-works-next]")?.addEventListener("click", () => flip(1));
-    document.querySelector("[data-works-prev]")?.addEventListener("click", () => flip(-1));
+    // свайп по экрану телефона (index-page.js сообщает направление)
+    phone.closest("[data-works-focus]")?.addEventListener("nh:works-step", (event) => {
+      flip(event.detail?.direction > 0 ? 1 : -1);
+    });
     const thumbs = Array.from(document.querySelectorAll("[data-works-thumb]"));
     thumbs.forEach((thumb) => {
       thumb.addEventListener("click", () => {
