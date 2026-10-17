@@ -35,6 +35,7 @@
       return false;
     }
   })();
+  av1Check.then((ok) => { preferAv1 = ok; });
 
   const ensureSource = (video) => {
     const src = (preferAv1 && video.dataset.srcAv1) || video.dataset.src;
@@ -119,10 +120,7 @@
       tapeObserver.observe(heroTape);
     };
 
-    av1Check.then((ok) => {
-      preferAv1 = ok;
-      startHeroTape();
-    });
+    av1Check.then(startHeroTape);
   }
 
   // Works focus gallery
@@ -162,6 +160,7 @@
       const thumb = thumbs[activeIndex];
       const type = thumb.getAttribute("data-type") || "image";
       const src = thumb.getAttribute("data-src") || "";
+      const srcAv1 = thumb.getAttribute("data-src-av1") || "";
       const poster = thumb.getAttribute("data-poster") || src;
 
       thumbs.forEach((item, i) => {
@@ -187,6 +186,8 @@
         if (focusVideo.dataset.currentSrc !== src) {
           pauseVideo(focusVideo);
           focusVideo.dataset.src = src;
+          if (srcAv1) focusVideo.dataset.srcAv1 = srcAv1;
+          else delete focusVideo.dataset.srcAv1;
           focusVideo.dataset.currentSrc = src;
           focusVideo.dataset.loaded = "0";
           focusVideo.removeAttribute("src");

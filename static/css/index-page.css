@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Kudry Weird Headline";
-    src: url("/static/kudry_weird-headline.otf") format("opentype");
+    src: url("/static/kudry_weird-headline.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -8,7 +8,7 @@
 
   @font-face {
     font-family: "Cormorant Regular";
-    src: url("/static/Cormorant-Regular.ttf") format("truetype");
+    src: url("/static/Cormorant-Regular.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -16,7 +16,7 @@
 
   @font-face {
     font-family: "Classica Two";
-    src: url("/static/Classica Two.ttf") format("truetype");
+    src: url("/static/Classica%20Two.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -24,7 +24,7 @@
 
   @font-face {
     font-family: "Soledago";
-    src: url("/static/Soledago.ttf") format("truetype");
+    src: url("/static/Soledago.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -32,7 +32,7 @@
 
   @font-face {
     font-family: "FoglihtenNo06";
-    src: url("/static/FoglihtenNo06.otf") format("opentype");
+    src: url("/static/FoglihtenNo06.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -40,7 +40,7 @@
 
   @font-face {
     font-family: "Passions Conflict";
-    src: url("/static/Passions%20Conflict%20RUS/PassionsConflictRUS-Regular.otf") format("opentype");
+    src: url("/static/Passions%20Conflict%20RUS/PassionsConflictRUS-Regular.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -48,7 +48,7 @@
 
   @font-face {
     font-family: "Isadora Cyr";
-    src: url("/static/IsadoraCyr.ttf") format("truetype");
+    src: url("/static/IsadoraCyr.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -56,7 +56,7 @@
 
   @font-face {
     font-family: "Nudla";
-    src: url("/static/Nudla-Thin.otf") format("opentype");
+    src: url("/static/Nudla-Thin.woff2") format("woff2");
     font-style: normal;
     font-weight: 100;
     font-display: swap;
@@ -64,7 +64,7 @@
 
   @font-face {
     font-family: "Arkana";
-    src: url("/static/ArkanaScript.ttf") format("truetype");
+    src: url("/static/ArkanaScript.woff2") format("woff2");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
