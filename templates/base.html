@@ -109,9 +109,11 @@
         <a href="/offer">Оферта</a>
         #}
         <a href="{{ telegram_url|default('https://t.me/Dyshekova_Olesia') }}" target="_blank" rel="noopener">Telegram</a>
-        <a href="{{ instagram_url|default('https://www.instagram.com/nailis.hub/') }}" target="_blank" rel="noopener">Instagram</a>
+        <a href="{{ instagram_url|default('https://www.instagram.com/nailis.hub/') }}" target="_blank" rel="noopener"><span translate="no">Instagram</span>*</a>
       </div>
       <div class="footer-copy">&copy; 2026 Nailis.hub</div>
+      {# Требование к упоминанию Instagram в РФ; звёздочки — у ссылок на Instagram #}
+      <p class="footer-note">* <span translate="no">Instagram</span> принадлежит компании <span translate="no">Meta</span>, признанной экстремистской организацией и запрещённой на территории Российской Федерации.</p>
     </div>
   </footer>
 

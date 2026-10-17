@@ -3,7 +3,7 @@
   "items": [
     {
       "name": "Акмарал",
-      "course": "Junior",
+      "course": "базовый курс",
       "original": "/static/images/reviews/akmaral.webp",
       "original_thumb": "/static/images/reviews/akmaral-thumb.webp",
       "messages": [
@@ -13,7 +13,7 @@
     },
     {
       "name": "Мария",
-      "course": "Junior",
+      "course": "базовый курс",
       "original": "/static/images/reviews/maria.webp",
       "original_thumb": "/static/images/reviews/maria-thumb.webp",
       "messages": [
@@ -23,7 +23,7 @@
     },
     {
       "name": "Анна",
-      "course": "Junior",
+      "course": "базовый курс",
       "original": "/static/images/reviews/anna.webp",
       "original_thumb": "/static/images/reviews/anna-thumb.webp",
       "messages": [
@@ -32,7 +32,7 @@
     },
     {
       "name": "Алена",
-      "course": "Junior",
+      "course": "базовый курс",
       "original": "/static/images/reviews/alena.webp",
       "original_thumb": "/static/images/reviews/alena-thumb.webp",
       "messages": [

@@ -208,7 +208,7 @@
     </div>
 
     <div class="tariff-grid" data-tariff-grid>
-      <article class="tariff-card tariff-card--dark" data-tariff-card data-tariff-id="junior">
+      <article class="tariff-card tariff-card--dark" data-tariff-card data-tariff-id="junior" data-tariff-short="Базовый">
         <div class="tariff-chips"><span class="tariff-chip">Офлайн</span><span class="tariff-chip">3&nbsp;дня</span><span class="tariff-chip">Для новичков</span></div>
         <p class="tariff-name" translate="no">Junior</p>
         <h3 class="tariff-title">Базовый курс</h3>
@@ -295,7 +295,7 @@
         </template>
       </article>
 
-      <article class="tariff-card tariff-card--light" data-tariff-card data-tariff-id="middle">
+      <article class="tariff-card tariff-card--light" data-tariff-card data-tariff-id="middle" data-tariff-short="Повышение">
         <div class="tariff-chips"><span class="tariff-chip">Офлайн</span><span class="tariff-chip">1&nbsp;день</span><span class="tariff-chip">Для опытных</span></div>
         <p class="tariff-name" translate="no">Middle</p>
         <h3 class="tariff-title">Повышение квалификации</h3>
@@ -369,7 +369,7 @@
     <div class="tariff-soon">
       <span class="tariff-soon-badge"><span class="tariff-soon-dot" aria-hidden="true"></span>Скоро</span>
       <div class="tariff-soon-body">
-        <p class="tariff-soon-title"><span translate="no">ONLINE</span>-курс</p>
+        <p class="tariff-soon-title">Онлайн-курс</p>
         <ul class="tariff-soon-features">
           <li>Видео-уроки</li>
           <li>Домашние задания с&nbsp;обратной связью</li>
@@ -457,7 +457,7 @@
         <div class="tdialog-actions">
           <a class="tariff-btn tariff-btn--main tdialog-cta" data-tariff-dialog-cta href="#" target="_blank" rel="noopener noreferrer">Записаться в&nbsp;<span translate="no">Telegram</span></a>
           <div class="tdialog-secondary">
-            <a class="tariff-link" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" translate="no">Instagram</a>
+            <a class="tariff-link" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer"><span translate="no">Instagram</span>*</a>
             {% if show_callback %}<button type="button" class="tariff-link" data-callback-pop-open aria-haspopup="dialog" aria-controls="tariff-callback-pop">Оставить контакты</button>{% endif %}
           </div>
         </div>
@@ -872,7 +872,7 @@
             {{ msgr_avatar(c, loop.index0, "msgr-avatar--sm") }}
             <div>
               <b>{{ c.name }}</b>
-              <span>ученица{% if c.course %} · <span translate="no">{{ c.course }}</span>{% endif %}</span>
+              <span>ученица{% if c.course %} · {{ c.course }}{% endif %}</span>
             </div>
             {% if c.original %}
             <button type="button" class="msgr-original" data-msgr-zoom="{{ c.original }}" data-msgr-zoom-alt="Скриншот отзыва: {{ c.name }}">
@@ -919,7 +919,7 @@
   <section class="home-section faq-section" data-reveal id="faq">
     <div class="section-head">
       <div>
-        <span class="kicker" translate="no">FAQ</span>
+        <span class="kicker">Перед записью</span>
         <h2>Частые вопросы</h2>
       </div>
     </div>
@@ -940,7 +940,7 @@
       <details class="faq-item" data-faq="format">
         <summary>Есть ли рассрочка или возможность оплаты частями?</summary>
         <div class="faq-answer">
-          <p>Да. Можно оплатить частями. Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — подберём удобный вариант</p>
+          <p>Да. Можно оплатить частями. Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span>* — подберём удобный вариант</p>
         </div>
       </details>
       <details class="faq-item" data-faq="support">
@@ -964,10 +964,10 @@
       <details class="faq-item" data-faq="signup">
         <summary>Как записаться?</summary>
         <div class="faq-answer">
-          <p>Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span> — расскажите, какой формат интересен (повышение / базовый)</p>
+          <p>Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span>* — расскажите, какой формат интересен (повышение / базовый)</p>
           <p class="faq-contact-links">
             <a href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс'|urlencode }}" class="faq-link" target="_blank" rel="noopener noreferrer" translate="no">Telegram</a>
-            <a href="{{ instagram_url }}" class="faq-link" target="_blank" rel="noopener noreferrer" translate="no">Instagram</a>
+            <a href="{{ instagram_url }}" class="faq-link" target="_blank" rel="noopener noreferrer"><span translate="no">Instagram</span>*</a>
           </p>
         </div>
       </details>
@@ -990,13 +990,13 @@
     <div class="final-cta-copy">
       <p class="hero-brand" translate="no">Nailis.hub</p>
       <h2 data-split-chars>Готовы начать?</h2>
-      <p>{% if show_callback %}Напишите в мессенджер или оставьте контакты{% else %}Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span>{% endif %} — подберём формат и дату старта.</p>
+      <p>{% if show_callback %}Напишите в мессенджер или оставьте контакты{% else %}Напишите в <span translate="no">Telegram</span> или <span translate="no">Instagram</span>*{% endif %} — подберём формат и дату старта.</p>
       <div class="final-cta-actions">
         <a href="{{ telegram_url }}?text={{ 'Добрый день! Хочу записаться на курс'|urlencode }}" class="home-btn primary" target="_blank" rel="noopener noreferrer" translate="no">
           Telegram
         </a>
-        <a href="{{ instagram_url }}" class="home-btn secondary" target="_blank" rel="noopener noreferrer" translate="no">
-          Instagram
+        <a href="{{ instagram_url }}" class="home-btn secondary" target="_blank" rel="noopener noreferrer">
+          <span translate="no">Instagram</span>*
         </a>
       </div>
 

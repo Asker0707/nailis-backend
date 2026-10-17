@@ -370,6 +370,14 @@ main.container.main-content {
   color: var(--nh-ink-muted);
 }
 
+.footer-note {
+  width: 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--nh-ink-muted);
+}
+
 /* Watermark */
 .vertical-watermark {
   position: fixed;

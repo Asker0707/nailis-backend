@@ -454,7 +454,8 @@
     if (!(btn instanceof HTMLElement)) return [];
     return [{
       id: tariffCard.dataset.tariffId || "",
-      name: tariffCard.querySelector(".tariff-name")?.textContent.trim() || "",
+      // короткое русское название для переключателя (Junior/Middle — только подпись в карточке)
+      name: tariffCard.dataset.tariffShort || tariffCard.querySelector(".tariff-name")?.textContent.trim() || "",
       card: tariffCard,
       btn,
     }];
@@ -617,7 +618,6 @@
       item.className = "tdialog-switch-btn";
       item.dataset.tariff = tariff.id;
       item.textContent = tariff.name;
-      item.setAttribute("translate", "no");
       item.addEventListener("click", () => {
         if (current === tariff) return;
         fill(tariff);
