@@ -425,9 +425,8 @@
   min-height: 0;
   overflow-y: auto;
   padding: 1.6rem 1.6rem 1rem;
-  background:
-    radial-gradient(120% 60% at 100% 0%, rgba(120, 58, 44, 0.45), rgba(120, 58, 44, 0) 60%),
-    #311b14;
+  /* ровный фон: свечение в углу на телефоне обрывалось под «ручкой» шторки полосой */
+  background: #311b14;
   color: #ede6d8;
 }
 
